@@ -3,4 +3,4 @@ venv/
 __pycache__/
 *.iml
 *.xml
-
+*.db
