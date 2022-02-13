@@ -3,3 +3,4 @@ flask-restx
 marshmallow
 Flask-SQLAlchemy
 Flask-Admin
+pytest
