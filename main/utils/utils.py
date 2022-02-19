@@ -15,3 +15,4 @@ def crop_sql_err(sql_err: str):
     sql_err = sql_err[idx + 1:]
     return sql_err.split("'", 1)[0]
 
+

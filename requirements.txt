@@ -1,6 +1,9 @@
 Flask
 flask-restx
 marshmallow
+marshmallow-sqlalchemy
+flask-marshmallow
 Flask-SQLAlchemy
 Flask-Admin
 pytest
+pyjwt

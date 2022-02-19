@@ -6,7 +6,7 @@ from ..utils import CryptoManager
 
 
 class User(db.Model):
-    id = db.Column(db.String(32), primary_key=True, default=str(uuid4))
+    id = db.Column(db.String(32), primary_key=True, default=str(uuid4()))
     username = db.Column(db.String(CRED_MAX_LENGTH),
                          nullable=False,
                          unique=True)

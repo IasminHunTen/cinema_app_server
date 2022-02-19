@@ -1,3 +1,0 @@
-class SQLDuplicateException(Exception):
-    pass
-

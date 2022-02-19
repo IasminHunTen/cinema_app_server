@@ -2,7 +2,7 @@ from flask import Flask, Blueprint
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 
-from .extra_modules import api, db
+from .extra_modules import api, db, flask_marshal
 from .controllers import User
 from .routes import users_ns
 
@@ -18,6 +18,8 @@ def create_app():
     app.config.from_object('config.dev.Config')
 
     db.init_app(app)
+    flask_marshal.init_app(app)
+
     admin.init_app(app)
     admin.add_view(ModelView(User, db.session))
     with app.app_context():
