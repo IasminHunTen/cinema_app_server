@@ -4,7 +4,7 @@ import json
 from werkzeug.exceptions import BadRequest
 from flask import request, current_app as app
 
-from ..extra_modules import api, AuthException
+from extra_modules import api, AuthException
 
 
 def inject_validated_payload(schema):

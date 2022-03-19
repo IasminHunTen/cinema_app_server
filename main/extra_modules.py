@@ -2,14 +2,6 @@ from flask_restx import Api
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 
-auth_in_header = {
-    'token': {
-        'type': 'auth',
-        'in': 'header',
-        'name': 'Auth Token'
-    }
-}
-
 
 class SQLDuplicateException(Exception):
     pass
@@ -18,6 +10,8 @@ class SQLDuplicateException(Exception):
 class AuthException(Exception):
     pass
 
+class NotFound(Exception):
+    pass
 
 api = Api()
 db = SQLAlchemy()
@@ -32,5 +26,11 @@ def _sql_err(error):
 @api.errorhandler(AuthException)
 def _auth_err(error):
     return {'AuthError': str(error)}, 401
+
+
+@api.errorhandler(NotFound)
+def _not_found_err(error):
+    return {'Not Found': str(error)}, 404
+
 
 
