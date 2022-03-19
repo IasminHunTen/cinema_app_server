@@ -1,3 +1,10 @@
+import uuid
+
+
+def uuid_generator():
+    return str(uuid.uuid4())
+
+
 def str_inter(left, right):
     left_set = set(list(left))
     right_set = set(list(right))
@@ -16,3 +23,9 @@ def crop_sql_err(sql_err: str):
     return sql_err.split("'", 1)[0]
 
 
+def debug_print(*args, **kwargs):
+    print('\n###################################\n')
+    print(*args)
+    for (k, v) in kwargs:
+        print(k, ': ', v)
+    print('\n###################################\n')

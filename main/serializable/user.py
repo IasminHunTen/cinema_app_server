@@ -1,4 +1,4 @@
-from ..extra_modules import api
+from extra_modules import api
 from flask_restx import fields
 
 user_post_model = api.model('UserPostSchema', {

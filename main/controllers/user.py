@@ -1,12 +1,10 @@
-from uuid import uuid4
-
-from ..extra_modules import db
-from ..constants import CRED_MAX_LENGTH
-from ..utils import CryptoManager
+from extra_modules import db
+from constants import CRED_MAX_LENGTH
+from utils import CryptoManager, uuid_generator
 
 
 class User(db.Model):
-    id = db.Column(db.String(32), primary_key=True, default=str(uuid4()))
+    id = db.Column(db.String(64), primary_key=True, default=uuid_generator)
     username = db.Column(db.String(CRED_MAX_LENGTH),
                          nullable=False,
                          unique=True)
@@ -25,6 +23,9 @@ class User(db.Model):
     def db_store(self):
         db.session.add(self)
         db.session.commit()
+
+
+
 
 
 

@@ -1,10 +1,10 @@
 from marshmallow import Schema, fields, validate, ValidationError
 from string import ascii_lowercase, ascii_uppercase, whitespace
 
-from ..constants import CRED_MIN_LENGTH, CRED_MAX_LENGTH, \
+from constants import CRED_MIN_LENGTH, CRED_MAX_LENGTH, \
     CRED_OUT_OF_BOUNDS, PASSWORD_WITH_WHITESPACES, PASSWORD_WITHOUT_LOWERCASE, PASSWORD_WITHOUT_UPPERCASE
-from ..utils import str_inter
-from ..extra_modules import flask_marshal as fm
+from utils import str_inter
+from extra_modules import flask_marshal as fm
 
 
 def _validate_cred(cred):
