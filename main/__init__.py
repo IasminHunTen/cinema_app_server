@@ -4,7 +4,7 @@ from flask_admin.contrib.sqla import ModelView
 
 from extra_modules import api, db, flask_marshal
 from controllers import User, Genre, Room, Actor
-from routes import users_ns, actors_ns, genres_ns
+from routes import users_ns, actors_ns, genres_ns, rooms_ns
 
 admin = Admin()
 
@@ -16,6 +16,7 @@ def create_app():
     api.add_namespace(users_ns)
     api.add_namespace(actors_ns)
     api.add_namespace(genres_ns)
+    api.add_namespace(rooms_ns)
     app.register_blueprint(blueprint)
     app.config.from_object('config.dev.Config')
 

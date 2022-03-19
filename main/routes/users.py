@@ -31,7 +31,7 @@ class UserResource(Resource):
     @ns.doc(params=auth_in_header)
     @ns.response(*doc_resp(FETCH_RESP))
     @required_login(as_admin=True)
-    def get(self, token_payload):
+    def get(self, token_data):
         user_list = User.query.all()
         return GetUsers(many=True).dump(user_list), 200
 

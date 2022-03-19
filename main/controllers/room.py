@@ -1,6 +1,6 @@
 import re
 
-from extra_modules import db
+from extra_modules import db, NotFound
 from utils import uuid_generator
 
 
@@ -19,34 +19,37 @@ def name_generator():
 class Room(db.Model):
     id = db.Column(db.String(64), primary_key=True, default=uuid_generator)
     name = db.Column(db.String(64), unique=True, default=name_generator)
-    sits = db.Column(db.Integer())
+    sits = db.Column(db.Integer(), default=128)
 
     def __init__(self, name, sits):
         self.name = name
         self.sits = sits
 
-    def store_room(self):
+    def db_store(self):
         db.session.add(self)
         db.session.commit()
 
-    def fetch_all(self):
-        return self.query.all()
+    @classmethod
+    def fetch_all(cls):
+        return cls.query.all()
 
-    def fetch_by_id(self, room_id):
-        return self.query.get(room_id)
-
-    def alter_room(self, room_id, name=None, sits=None):
-        room = self.query.get(room_id)
+    @classmethod
+    def alter_room(cls, id, name=None, sits=None):
+        room = cls.query.get(id)
+        if room is None:
+            raise NotFound(f'room with id={id}')
         if name:
-            self.name = name
+            room.name = name
         if sits:
-            self.sits = sits
+            room.sits = sits
         db.session.commit()
 
-    def delete_room(self, room_id):
-        db.session.delete(
-            self.query.get(room_id)
-        )
+    @classmethod
+    def delete_room(self, id):
+        room = self.query.get(id)
+        if room is None:
+            raise NotFound(f'room with id={id}')
+        db.session.delete(room)
         db.session.commit()
 
 

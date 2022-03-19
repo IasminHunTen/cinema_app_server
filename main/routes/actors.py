@@ -1,44 +1,52 @@
 from flask import request
 from flask_restx import Resource
 
-from constants import CREATE_RESP, UPDATE_RESP, FETCH_RESP, ids_in_query
+from constants import ids_in_query, auth_in_header
+from constants.req_responses import *
 from extra_modules import api, NotFound
 from controllers import Actor
 from serializable.actor import *
-from utils import inject_validated_payload, doc_resp
+from utils import inject_validated_payload, doc_resp, required_login
 from models.actor import *
 
 ns = api.namespace('actors')
 
 
 @ns.route('/')
+@ns.response(*doc_resp(UPDATE_RESP))
 class ActorsResource(Resource):
     @ns.response(*doc_resp(CREATE_RESP))
     @ns.expect(actor_post_model)
+    @ns.doc(params=auth_in_header)
+    @required_login(as_admin=True)
     @inject_validated_payload(PostActor())
-    def post(self, payload):
+    def post(self, payload, token_data):
         Actor(**payload).db_store()
         return CREATE_RESP
 
     @ns.response(*doc_resp(UPDATE_RESP))
     @ns.expect(actor_put_model)
+    @ns.doc(params=auth_in_header)
     @inject_validated_payload(PutActor())
-    def put(self, payload):
+    @required_login(as_admin=True)
+    def put(self, payload, token_data):
         try:
             Actor.edit_actor(**payload)
         except NotFound as nf:
             raise nf
         return UPDATE_RESP
 
-    @ns.response(*doc_resp(UPDATE_RESP))
+    @ns.response(*doc_resp(DELETE_RESP))
     @ns.expect(actor_delete_model)
+    @ns.doc(params=auth_in_header)
     @inject_validated_payload(DeleteActor())
-    def delete(self, payload):
+    @required_login(as_admin=True)
+    def delete(self, payload, token_data):
         try:
             Actor.delete_actor(**payload)
         except NotFound as nf:
             raise nf
-        return UPDATE_RESP
+        return DELETE_RESP
 
     @ns.response(*doc_resp(FETCH_RESP))
     @ns.marshal_list_with(actor_get_model)

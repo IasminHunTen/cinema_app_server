@@ -25,12 +25,12 @@ def required_login(as_admin=False):
             if 'Token' not in request.headers:
                 raise AuthException('Auth Token is missing')
             try:
-                token_payload = jwt.decode(request.headers.get('Token'), app.config['SECRET_KEY'], 'HS256')
+                token_data = jwt.decode(request.headers.get('Token'), app.config['SECRET_KEY'], 'HS256')
             except jwt.PyJWTError as e:
                 raise AuthException(e)
-            if as_admin and not token_payload.get('isAdmin'):
+            if as_admin and not token_data.get('isAdmin'):
                 raise AuthException('Admin rights are needed')
-            return f(*args, **kwargs, token_payload=token_payload)
+            return f(*args, **kwargs, token_data=token_data)
         return wrapper
     return decorator
 
