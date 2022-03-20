@@ -3,8 +3,8 @@ from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 
 from extra_modules import api, db, flask_marshal
-from controllers import User, Genre, Room, Actor
-from routes import users_ns, actors_ns, genres_ns, rooms_ns
+from controllers import User, Genre, Room, Cast
+from routes import users_ns, casts_ns, genres_ns, rooms_ns
 
 admin = Admin()
 
@@ -14,7 +14,7 @@ def create_app():
     blueprint = Blueprint('api', __name__, url_prefix='/api/doc')
     api.init_app(blueprint)
     api.add_namespace(users_ns)
-    api.add_namespace(actors_ns)
+    api.add_namespace(casts_ns)
     api.add_namespace(genres_ns)
     api.add_namespace(rooms_ns)
     app.register_blueprint(blueprint)
@@ -27,7 +27,7 @@ def create_app():
     admin.add_view(ModelView(User, db.session))
     admin.add_view(ModelView(Genre, db.session))
     admin.add_view(ModelView(Room, db.session))
-    admin.add_view(ModelView(Actor, db.session))
+    admin.add_view(ModelView(Cast, db.session))
     with app.app_context():
         db.create_all()
     return app
