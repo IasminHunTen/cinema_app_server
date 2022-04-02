@@ -14,14 +14,14 @@ class Cast(db.Model):
         db.session.commit()
 
     @classmethod
-    def fetch_actors(cls, ids=None):
+    def fetch_cast(cls, ids=None):
         if ids is None:
             return cls.query.all()
         content = []
         for id in ids:
             actor = cls.query.get(id)
             if actor is None:
-                raise NotFound(f'actor with id={id}')
+                raise NotFound(f'cast member with id={id}')
             content.append(actor)
         return content
 
@@ -29,7 +29,7 @@ class Cast(db.Model):
     def delete_actor(cls, id):
         actor = cls.query.get(id)
         if actor is None:
-            raise NotFound(f'actor with id={id}')
+            raise NotFound(f'cast member with id={id}')
         db.session.delete(actor)
         db.session.commit()
 
@@ -37,7 +37,7 @@ class Cast(db.Model):
     def edit_actor(cls, id, name):
         actor = cls.query.get(id)
         if actor is None:
-            raise NotFound(f'actor with id={id}')
+            raise NotFound(f'cast member with id={id}')
         if actor.name == name:
             return
         actor.name = name

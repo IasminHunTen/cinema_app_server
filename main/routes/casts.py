@@ -55,8 +55,8 @@ class CastsResource(Resource):
         schema = GetCast(many=True)
         ids = request.args.get('ids')
         if not ids:
-            return schema.dump(Cast.fetch_actors()), 200
-        return schema.dump(Cast.fetch_actors(ids.split())), 200
+            return schema.dump(Cast.fetch_cast()), 200
+        return schema.dump(Cast.fetch_cast(ids.split())), 200
 
 
 

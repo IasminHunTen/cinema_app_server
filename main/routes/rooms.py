@@ -41,7 +41,7 @@ class RoomResource(Resource):
             raise e
 
     @ns.response(*doc_resp(DELETE_RESP))
-    @ns.expect(delete_room_model)
+    @ns.expect(delete_room_model, validate=False)
     @inject_validated_payload(DeleteRoom())
     @ns.doc(params=auth_in_header)
     @required_login(as_admin=True)

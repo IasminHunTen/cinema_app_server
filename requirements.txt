@@ -8,3 +8,4 @@ Flask-Admin
 cryptography
 pytest
 pyjwt
+requests

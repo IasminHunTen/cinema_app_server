@@ -1,4 +1,4 @@
-from flask_restx import Api
+from flask_restx import Api, fields
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 
@@ -9,6 +9,7 @@ class SQLDuplicateException(Exception):
 
 class AuthException(Exception):
     pass
+
 
 class NotFound(Exception):
     pass
@@ -31,6 +32,15 @@ def _auth_err(error):
 @api.errorhandler(NotFound)
 def _not_found_err(error):
     return {'Not Found': str(error)}, 404
+
+
+class DictItem(fields.Raw):
+    def output(self, key, obj, *args, **kwargs):
+        try:
+            dct = getattr(obj, self.attribute)
+        except AttributeError:
+            return {}
+        return dct or {}
 
 
 
