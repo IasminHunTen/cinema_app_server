@@ -27,6 +27,19 @@ class Movie(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    def obj_as_dict(self):
+        return {
+            'id': self.id,
+            'tag': self.tag,
+            'title': self.title,
+            'plot': self.plot,
+            'year': self.year,
+            'imdb_rate': self.imdb_rate,
+            'run_time': self.run_time,
+            'poster': self.poster,
+            'trailer': self.trailer
+        }
+
     @classmethod
     def fetch_movies(cls, ids=None):
         if ids is None:
@@ -55,6 +68,11 @@ class Movie(db.Model):
             raise NotFound(f'movie with id={id}')
         db.session.delete(movie)
         db.session.commit()
+
+    @classmethod
+    def get_id_by_tag(cls, tag):
+        return cls.query.filter_by(tag=tag).first().id
+
 
 
 

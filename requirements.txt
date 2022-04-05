@@ -9,3 +9,4 @@ cryptography
 pytest
 pyjwt
 requests
+split

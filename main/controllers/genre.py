@@ -48,3 +48,11 @@ class Genre(db.Model):
             cls.query.get(id)
         )
         db.session.commit()
+
+    @classmethod
+    def get_id_by_genre(cls, genre):
+        return cls.query.filter_by(genre=genre).first().id
+
+    @classmethod
+    def get_genre_by_id(cls, id):
+        return cls.query.get(id).genre

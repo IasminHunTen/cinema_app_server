@@ -1,17 +1,22 @@
+from sqlalchemy.exc import IntegrityError
+
 from extra_modules import db, NotFound
 from utils import uuid_generator, debug_print
 
 
 class Cast(db.Model):
     id = db.Column(db.String(64), primary_key=True, default=uuid_generator)
-    name = db.Column(db.String(128))
+    name = db.Column(db.String(128), unique=True)
 
     def __init__(self, name):
         self.name = name
 
     def db_store(self):
-        db.session.add(self)
-        db.session.commit()
+        try:
+            db.session.add(self)
+            db.session.commit()
+        except IntegrityError:
+            return
 
     @classmethod
     def fetch_cast(cls, ids=None):
@@ -42,6 +47,14 @@ class Cast(db.Model):
             return
         actor.name = name
         db.session.commit()
+
+    @classmethod
+    def get_id_by_name(cls, name):
+        return cls.query.filter_by(name=name).first().id
+
+    @classmethod
+    def get_name_by_id(cls, id):
+        return cls.query.get(id).name
 
 
 

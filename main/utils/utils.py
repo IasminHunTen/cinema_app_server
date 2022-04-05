@@ -1,6 +1,7 @@
 import uuid
 
 from marshmallow import ValidationError
+from split import partition
 
 
 def uuid_generator():
