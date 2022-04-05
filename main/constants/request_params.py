@@ -12,3 +12,10 @@ ids_in_query = {
         'in': 'query',
     }
 }
+
+date_in_query = {
+    'date': {
+        'type': 'date',
+        'in': 'query'
+    }
+}

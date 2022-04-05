@@ -18,13 +18,15 @@ class RoomResource(Resource):
     @ns.marshal_list_with(get_room_model)
     @ns.doc(params=auth_in_header)
     @required_login(as_admin=True)
-    def get(self):
+    def get(self, token_data):
         return GetRoom(many=True).dump(Room.fetch_all())
 
     @ns.response(*doc_resp(CREATE_RESP))
     @ns.expect(post_room_model)
     @inject_validated_payload(PostRoom())
-    def post(self, payload):
+    @ns.doc(params=auth_in_header)
+    @required_login(as_admin=True)
+    def post(self, payload, token_data):
         Room(**payload).db_store()
         return CREATE_RESP
 
@@ -33,7 +35,7 @@ class RoomResource(Resource):
     @inject_validated_payload(PutRoom())
     @ns.doc(params=auth_in_header)
     @required_login(as_admin=True)
-    def put(self, payload):
+    def put(self, payload, token_data):
         try:
             Room.alter_room(**payload)
             return UPDATE_RESP
@@ -45,7 +47,7 @@ class RoomResource(Resource):
     @inject_validated_payload(DeleteRoom())
     @ns.doc(params=auth_in_header)
     @required_login(as_admin=True)
-    def delete(self, payload):
+    def delete(self, payload, token_data):
         try:
             Room.delete_room(**payload)
             return DELETE_RESP

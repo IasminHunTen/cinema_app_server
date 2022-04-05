@@ -5,3 +5,4 @@ from .cast import Cast
 from .movie import Movie
 from .movie_cast import MovieCast
 from .movie_genres import MovieGenres
+from .schedule import Schedule

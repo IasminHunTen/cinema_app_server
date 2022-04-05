@@ -1,5 +1,3 @@
-from sqlalchemy import ForeignKey
-
 from extra_modules import db
 from . import Genre
 

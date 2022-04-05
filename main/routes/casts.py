@@ -21,7 +21,7 @@ class CastsResource(Resource):
     @required_login(as_admin=True)
     @inject_validated_payload(PostCast())
     def post(self, payload, token_data):
-        Actor(**payload).db_store()
+        Cast(**payload).db_store()
         return CREATE_RESP
 
     @ns.response(*doc_resp(UPDATE_RESP))

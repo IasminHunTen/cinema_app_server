@@ -1,7 +1,12 @@
 import uuid
-
+from flask import current_app as app
+from datetime import date
 from marshmallow import ValidationError
-from split import partition
+
+
+def app_config(key):
+    with app.app_context():
+        return app.config[key]
 
 
 def uuid_generator():
@@ -49,11 +54,30 @@ def dict_validator(data, constrains, min_keys=0):
             raise ValidationError(f"Value for '{k}' must to be of type '{constrains.get(k)}'")
 
 
+def tuple_overlap(t1, t2):
+    if t1[0] == t2[0]:
+        return False
+    return t1[0] < t2[0] if t1[1] < t2[0] else t2[1] < t1[0]
+
+
+def minutes_2_time(a, b):
+    def fun(minutes):
+        return '{}:{}'.format(*divmod(minutes, 60))
+    return f'{fun(a)}-{fun(b)}'
+
+
+def date_from_string(date_str):
+    return date(
+        *tuple(
+            map(int, date_str.split('-'))
+        )
+    )
+
+
 def debug_print(*args, **kwargs):
     print('\n###################################\n')
     print(*args)
     for (k, v) in kwargs:
         print(k, ': ', v)
     print('\n###################################\n')
-
 

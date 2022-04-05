@@ -45,12 +45,21 @@ class Room(db.Model):
         db.session.commit()
 
     @classmethod
-    def delete_room(self, id):
-        room = self.query.get(id)
+    def delete_room(cls, id):
+        room = cls.query.get(id)
         if room is None:
             raise NotFound(f'room with id={id}')
         db.session.delete(room)
         db.session.commit()
+
+    @classmethod
+    def get_sits_by_id(cls, id):
+        return cls.query.get(id).sits
+
+    @classmethod
+    def get_room_name_by_id(cls, id):
+        return cls.query.get(id).name
+
 
 
 

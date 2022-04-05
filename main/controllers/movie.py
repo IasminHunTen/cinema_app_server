@@ -73,6 +73,15 @@ class Movie(db.Model):
     def get_id_by_tag(cls, tag):
         return cls.query.filter_by(tag=tag).first().id
 
+    @classmethod
+    def get_run_time_by_id(cls, id):
+        return cls.query.get(id).run_time
+
+    @classmethod
+    def get_movie_title(cls, id):
+        return cls.query.get(id).title
+
+
 
 
 

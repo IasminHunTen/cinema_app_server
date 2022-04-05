@@ -11,8 +11,10 @@ from controllers import Movie, Cast, Genre, MovieGenres, MovieCast
 
 ns = api.namespace('movies')
 
+
 @ns.route('/')
 @ns.response(*doc_resp(BAD_REQUEST))
+@ns.response(*doc_resp(UNAUTHORIZED))
 class MovieResource(Resource):
 
     mra_client = MovieRapidAPI()
@@ -20,11 +22,11 @@ class MovieResource(Resource):
     @ns.response(*doc_resp(CREATE_RESP))
     @ns.response(*doc_resp(UNAUTHORIZED))
     @ns.response(*doc_resp(DUPLICATED))
-    @ns.expect(post_movie_model)
     @ns.doc(params=auth_in_header)
-    # @required_login(as_admin=True)
+    @ns.expect(post_movie_model)
+    @required_login(as_admin=True)
     @inject_validated_payload(PostSchema())
-    def post(self, payload):
+    def post(self, payload, token_data):
         try:
             top_cast = payload.pop('top_cast')
             movie_attributes = payload | self.mra_client.movie_factory(payload.get('tag'))
@@ -49,13 +51,18 @@ class MovieResource(Resource):
         return CREATE_RESP
 
     @ns.response(*doc_resp(FETCH_RESP))
+    @ns.response(*doc_resp(UNAUTHORIZED))
     @ns.marshal_list_with(get_movie_model)
-    def get(self):
+    @ns.doc(params=auth_in_header)
+    @required_login(as_admin=True)
+    def get(self, token_data):
         return GetSchema(many=True).dump(build_movies_payload(Movie.fetch_movies()))
 
     @ns.response(*doc_resp(UPDATE_RESP))
     @ns.expect(put_movie_model)
     @inject_validated_payload(PutSchema())
+    @required_login(as_admin=True)
+    @ns.doc(params=auth_in_header)
     def put(self, payload):
         Movie.edit_movie(**payload)
         return UPDATE_RESP
@@ -63,9 +70,9 @@ class MovieResource(Resource):
     @ns.response(*doc_resp(DELETE_RESP))
     @ns.expect(delete_movie_model)
     @inject_validated_payload(DeleteSchema())
+    @required_login(as_admin=True)
     @ns.doc(params=auth_in_header)
-    # @required_login(as_admin=True)
-    def delete(self, payload):
+    def delete(self, payload, token_data):
         Movie.delete_movies(**payload)
         return DELETE_RESP
 
