@@ -26,8 +26,7 @@ class UserPost(Schema):
     username = fields.String(required=True,
                              validate=_validate_cred)
     email = fields.String(required=True, validate=[validate.Email(), validate.Length(max=CRED_MAX_LENGTH)])
-    password = fields.String(required=True,
-                             validate=_validate_password)
+    password = fields.String(required=True,  validate=_validate_password)
     isAdmin = fields.Boolean(default=False)
 
 

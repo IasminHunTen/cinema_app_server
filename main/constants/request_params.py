@@ -6,16 +6,12 @@ auth_in_header = {
     }
 }
 
-ids_in_query = {
-    'ids': {
-        'type': 'string',
-        'in': 'query',
-    }
-}
 
-date_in_query = {
-    'date': {
-        'type': 'date',
-        'in': 'query'
+def string_from_query(key):
+    return {
+        key: {
+            'type': 'string',
+            'in': 'query'
+        }
     }
-}
+

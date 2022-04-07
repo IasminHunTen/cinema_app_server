@@ -74,6 +74,8 @@ class MovieResource(Resource):
     @ns.doc(params=auth_in_header)
     def delete(self, payload, token_data):
         Movie.delete_movies(**payload)
+        MovieCast.on_movie_delete(payload.get('id'))
+        MovieGenres.on_movie_delete(payload.get('id'))
         return DELETE_RESP
 
 

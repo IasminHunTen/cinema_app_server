@@ -33,6 +33,8 @@ def create_app():
     admin.add_view(ModelView(MovieCast, db.session))
     admin.add_view(ModelView(MovieGenres, db.session))
     admin.add_view(ModelView(Schedule, db.session))
+    admin.add_view(ModelView(UserDevices, db.session))
+    admin.add_view(ModelView(UserFavoriteGenres, db.session))
     with app.app_context():
         db.create_all()
     return app

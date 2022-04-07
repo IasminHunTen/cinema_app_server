@@ -2,7 +2,7 @@ from flask import request
 from flask_restx import Resource
 
 from constants.req_responses import *
-from constants import ids_in_query, auth_in_header
+from constants import string_from_query, auth_in_header
 from extra_modules import NotFound
 from utils import doc_resp, inject_validated_payload, required_login
 from models.genre import *
@@ -18,7 +18,7 @@ class GenresResource(Resource):
 
     @ns.response(*doc_resp(FETCH_RESP))
     @ns.response(*doc_resp(NOT_FOUND))
-    @ns.doc(params=ids_in_query)
+    @ns.doc(params=string_from_query('ids'))
     @ns.marshal_list_with(genre_get_model)
     def get(self):
         schema = GetGenres(many=True)

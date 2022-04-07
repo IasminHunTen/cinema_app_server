@@ -12,8 +12,7 @@ cast_put_model = api.model('PutActorSchema', {
 
 cast_get_model = api.model('GetActorSchema', {
     'id': fields.String(),
-    'name': fields.String(),
-    'counter': fields.Integer()
+    'name': fields.String()
 })
 
 cast_delete_model = api.model('DeleteActorSchema', {

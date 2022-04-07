@@ -4,7 +4,7 @@ from flask import request
 from models.schedule import *
 from serializable.schedule import *
 from constants.req_responses import *
-from constants import date_in_query
+from constants import string_from_query
 from utils import doc_resp, inject_validated_payload, date_from_string
 
 ns = api.namespace('schedule')
@@ -23,7 +23,7 @@ class ScheduleResource(Resource):
         return CREATE_RESP
 
     @ns.response(*doc_resp(FETCH_RESP))
-    @ns.doc(params=date_in_query)
+    @ns.doc(params=string_from_query('date'))
     @ns.marshal_list_with(get_schedule_model)
     def get(self):
         d = request.args.get('date')
@@ -39,6 +39,7 @@ class ScheduleResource(Resource):
     def delete(self, payload):
         Schedule.delete(**payload)
         return DELETE_RESP
+
 
 
 

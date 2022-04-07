@@ -42,5 +42,6 @@ class GetScheduleSchema(Schema):
     minute = fields.Integer()
     price = fields.Float()
 
+
 class DeleteScheduleSchema(Schema):
     id = fields.String(required=True)

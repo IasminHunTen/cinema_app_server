@@ -1,7 +1,7 @@
 from flask import request
 from flask_restx import Resource
 
-from constants import ids_in_query, auth_in_header
+from constants import auth_in_header, string_from_query
 from constants.req_responses import *
 from extra_modules import api, NotFound
 from controllers import Cast
@@ -50,7 +50,7 @@ class CastsResource(Resource):
 
     @ns.response(*doc_resp(FETCH_RESP))
     @ns.marshal_list_with(cast_get_model)
-    @ns.doc(params=ids_in_query)
+    @ns.doc(params=string_from_query('ids'))
     def get(self):
         schema = GetCast(many=True)
         ids = request.args.get('ids')

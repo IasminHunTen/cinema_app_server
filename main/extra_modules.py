@@ -14,6 +14,8 @@ class AuthException(Exception):
 class NotFound(Exception):
     pass
 
+
+
 api = Api()
 db = SQLAlchemy()
 flask_marshal = Marshmallow()
