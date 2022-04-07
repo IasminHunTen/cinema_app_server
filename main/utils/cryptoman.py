@@ -1,11 +1,12 @@
 from . import SingletonMeta
+from . import get_secret_key
 from cryptography.fernet import Fernet
 
 
 class CryptoManager(metaclass=SingletonMeta):
 
     def __init__(self):
-        self.__crypto_man = Fernet(Fernet.generate_key())
+        self.__crypto_man = Fernet(get_secret_key())
         self.__standard = 'utf-8'
 
     def encrypt_word(self, word):

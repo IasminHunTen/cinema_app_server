@@ -31,7 +31,7 @@ class UserFavoriteGenres(db.Model):
             db.session.add(
                 UserFavoriteGenres(user_id, genre_id)
             )
-        db.session()
+        db.session.commit()
 
     @classmethod
     def on_user_delete(cls, user_id):

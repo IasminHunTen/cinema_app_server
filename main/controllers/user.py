@@ -5,11 +5,9 @@ from utils import CryptoManager, uuid_generator
 
 class User(db.Model):
     id = db.Column(db.String(64), primary_key=True, default=uuid_generator)
-    username = db.Column(db.String(CRED_MAX_LENGTH),
-                         nullable=False,
-                         unique=True)
+    username = db.Column(db.String(CRED_MAX_LENGTH), unique=True)
     email = db.Column(db.String(CRED_MAX_LENGTH), unique=True)
-    password = db.Column(db.String(128), nullable=False)
+    password = db.Column(db.String(128))
     isAdmin = db.Column(db.Boolean, default=False)
 
     __crypto_man = CryptoManager()

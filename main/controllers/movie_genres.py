@@ -1,6 +1,7 @@
 from extra_modules import db
 from . import Genre
 
+
 class MovieGenres(db.Model):
     pk = db.Column(db.Integer, primary_key=True)
     movie_id = db.Column(db.String(64))

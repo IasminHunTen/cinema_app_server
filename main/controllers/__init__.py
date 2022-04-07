@@ -8,3 +8,4 @@ from .movie_genres import MovieGenres
 from .schedule import Schedule
 from .user_devices import UserDevices
 from .user_favorite_genres import UserFavoriteGenres
+from .credit_card import CreditCard

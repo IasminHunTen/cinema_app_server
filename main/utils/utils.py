@@ -2,7 +2,9 @@ import uuid
 from flask import current_app as app
 from datetime import date
 from marshmallow import ValidationError
-
+import os
+import json
+from cryptography.fernet import Fernet
 
 def app_config(key):
     with app.app_context():
@@ -72,6 +74,24 @@ def date_from_string(date_str):
             map(int, date_str.split('-'))
         )
     )
+
+
+def get_secret_key():
+    print(os.getcwd())
+    path = 'main/config/secrets.json'
+    if os.path.exists(path):
+        with open(path) as fd:
+            secret_key = bytes(
+                json.load(fd).get('secret_key'),
+                'utf-8'
+            )
+    else:
+        secret_key = Fernet.generate_key()
+        with open(path, 'w') as fd:
+            json.dump({
+                'secret_key': secret_key.decode()
+            }, fd)
+    return secret_key
 
 
 def debug_print(*args, **kwargs):

@@ -6,10 +6,12 @@ from datetime import datetime, timedelta
 from werkzeug.exceptions import BadRequest
 
 from extra_modules import api, SQLDuplicateException
-from controllers import User, UserDevices, UserFavoriteGenres
+from controllers import User, UserDevices, UserFavoriteGenres, CreditCard
 from serializable import user_post_model, user_token_model, get_user_devices_model, ufg_model
+from serializable.credit_card import *
 from utils import inject_validated_payload, doc_resp, crop_sql_err, required_login, debug_print
 from models import UserPost, GetUsers, GetUserDeviceSchema, UFGSchema
+from models.credit_card import *
 from constants.req_responses import *
 from constants import SQL_DUPLICATE_ERR, auth_in_header, string_from_query
 
@@ -112,10 +114,47 @@ class UFGResource(Resource):
         return UFGSchema().dump(UserFavoriteGenres.favorite_genres_for_user(token_data.get('id'))), 200
 
 
+@ns.route('/credit_card')
+@ns.response(*doc_resp(UNAUTHORIZED))
+class CreditCardResource(Resource):
+    @ns.response(*doc_resp(CREATE_RESP))
+    @ns.response(*doc_resp(BAD_REQUEST))
+    @ns.doc(params=auth_in_header)
+    @ns.expect(post_card_model)
+    @inject_validated_payload(PostCreditCard())
+    @required_login()
+    def post(self, payload, token_data):
+        CreditCard(token_data.get('id'), **payload).db_store()
+        return CREATE_RESP
 
+    @ns.response(*doc_resp(FETCH_RESP))
+    @ns.doc(params=auth_in_header)
+    @ns.marshal_list_with(get_card_model)
+    @required_login()
+    def get(self, token_data):
+        return GetCreditCard(many=True).dump(
+            CreditCard.fetch_user_credit_cards(
+                token_data.get('id')
+            )
+        ), 200
 
+    @ns.response(*doc_resp(UPDATE_RESP))
+    @ns.doc(params=auth_in_header)
+    @ns.expect(edit_card_amount_model)
+    @inject_validated_payload(EditCreditCardSold())
+    @required_login()
+    def put(self, payload, token_data):
+        CreditCard.alter_credit_card_sold(**payload)
+        return UPDATE_RESP
 
-
-
-
-
+    @ns.response(*doc_resp(DELETE_RESP))
+    @ns.response(*doc_resp(BAD_REQUEST))
+    @ns.doc(params=auth_in_header)
+    @ns.doc(params=string_from_query('card_number'))
+    @required_login()
+    def delete(self,  token_data):
+        card_number = request.args.get('card_number')
+        if card_number is None:
+            raise BadRequest("Missing card number from query")
+        CreditCard.delete_user_credit_card(card_number)
+        return DELETE_RESP

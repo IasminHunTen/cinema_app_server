@@ -8,7 +8,7 @@ class TestCryptoManager(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.crypto_man = CryptoManager()
-        cls.word = 'word_to_be_encrypted'
+        cls.word = '123'
 
     def test_crypto_man_is_singleton(self):
         assert self.crypto_man == CryptoManager()

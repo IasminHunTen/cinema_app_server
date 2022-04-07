@@ -2,7 +2,7 @@ class Config(object):
     SWAGGER_UI_JSONEDITOR = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///../database.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SECRET_KEY = 'dont tell anyone'
+    SECRET_KEY = b'JCek1hA-6XOsLKDR4Ih5UCiqM8_2hWownMVb0bHV0Ac='
     START_HOUR = 12
     LIMIT_HOUR = 23
     GAP_BETWEEN_MOVIES = 30
