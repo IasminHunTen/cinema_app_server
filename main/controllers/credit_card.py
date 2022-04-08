@@ -1,18 +1,11 @@
-from random import choice
-from string import digits
-
 from werkzeug.exceptions import BadRequest
 
 from extra_modules import db
-from utils import CryptoManager, debug_print
-
-
-def _generate_card_number():
-    return ''.join([choice(digits) for _ in range(16)])
+from utils import CryptoManager, generate_number_sequence
 
 
 def generate_pk():
-    key = _generate_card_number()
+    key = generate_number_sequence(16)
     return key if CreditCard.query.get(key) is None else generate_pk()
 
 
@@ -63,6 +56,6 @@ class CreditCard(db.Model):
     @classmethod
     def on_user_delete(cls, user_id):
         [
-            db.session.delete(card) for card in cls.query.filer_by(holder_id=user_id).all()
+            db.session.delete(card) for card in cls.query.filter_by(holder_id=user_id).all()
         ]
         db.session.commit()

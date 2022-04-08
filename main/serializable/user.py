@@ -14,8 +14,28 @@ user_get_model = api.model('UsersGetSchema', {
     'admin': fields.Boolean
 })
 
+delete_user_model = api.model('DeleteUser', {
+    'id': fields.String(required=True)
+})
+
+user_login_model = api.model('UserLoginSchema', {
+    'username': fields.String(),
+    'password': fields.String()
+})
+
 user_token_model = api.model('UserTokenSchema', {
     'token': fields.String()
 })
+
+user_prejudice_model = api.model('GetUserPrejudice', {
+    'prejudice': fields.Float()
+})
+
+reset_password_model = api.model('ResetPassword', {
+    'email': fields.String(required=True),
+    'new_password': fields.String(required=True),
+    'validation_code': fields.String(required=True)
+})
+
 
 

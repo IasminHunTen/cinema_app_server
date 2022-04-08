@@ -1,6 +1,7 @@
 from flask_restx import Api, fields
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from flask_mail import Mail
 
 
 class SQLDuplicateException(Exception):
@@ -15,10 +16,11 @@ class NotFound(Exception):
     pass
 
 
-
 api = Api()
 db = SQLAlchemy()
+mail = Mail()
 flask_marshal = Marshmallow()
+
 
 
 @api.errorhandler(SQLDuplicateException)

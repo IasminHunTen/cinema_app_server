@@ -1,15 +1,8 @@
 import uuid
-from flask import current_app as app
 from datetime import date
 from marshmallow import ValidationError
-import os
-import json
-from cryptography.fernet import Fernet
-
-def app_config(key):
-    with app.app_context():
-        return app.config[key]
-
+from random import choice
+from string import digits
 
 def uuid_generator():
     return str(uuid.uuid4())
@@ -76,24 +69,6 @@ def date_from_string(date_str):
     )
 
 
-def get_secret_key():
-    print(os.getcwd())
-    path = 'main/config/secrets.json'
-    if os.path.exists(path):
-        with open(path) as fd:
-            secret_key = bytes(
-                json.load(fd).get('secret_key'),
-                'utf-8'
-            )
-    else:
-        secret_key = Fernet.generate_key()
-        with open(path, 'w') as fd:
-            json.dump({
-                'secret_key': secret_key.decode()
-            }, fd)
-    return secret_key
-
-
 def debug_print(*args, **kwargs):
     print('\n###################################\n')
     print(*args)
@@ -101,3 +76,6 @@ def debug_print(*args, **kwargs):
         print(k, ': ', v)
     print('\n###################################\n')
 
+
+def generate_number_sequence(seq_len):
+    return ''.join([choice(digits) for _ in range(seq_len)])

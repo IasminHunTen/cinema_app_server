@@ -2,7 +2,7 @@ from flask import Flask, Blueprint
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from controllers import *
-from extra_modules import db, api, flask_marshal
+from extra_modules import db, api, flask_marshal, mail
 from routes import users_ns, casts_ns, genres_ns, rooms_ns, movies_ns, schedule_ns
 
 admin = Admin()
@@ -21,6 +21,7 @@ def create_app():
     app.register_blueprint(blueprint)
     app.config.from_object('config.dev.Config')
 
+    mail.init_app(app)
     db.init_app(app)
     flask_marshal.init_app(app)
 

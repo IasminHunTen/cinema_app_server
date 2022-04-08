@@ -1,18 +1,21 @@
 from flask_restx import Resource
 from flask import current_app as app, request
+from flask_mail import Message
 from sqlalchemy.exc import IntegrityError
 import jwt
 from datetime import datetime, timedelta
 from werkzeug.exceptions import BadRequest
 
-from extra_modules import api, SQLDuplicateException
+from extra_modules import mail, SQLDuplicateException
 from controllers import User, UserDevices, UserFavoriteGenres, CreditCard
-from serializable import user_post_model, user_token_model, get_user_devices_model, ufg_model
+from serializable import user_post_model, user_token_model, get_user_devices_model, ufg_model, user_login_model, \
+    reset_password_model, delete_user_model
 from serializable.credit_card import *
 from utils import inject_validated_payload, doc_resp, crop_sql_err, required_login, debug_print
-from models import UserPost, GetUsers, GetUserDeviceSchema, UFGSchema
+from models import UserPost, GetUsers, GetUserDeviceSchema, UFGSchema, UserLogin, ResetPassword, DeleteUser
 from models.credit_card import *
 from constants.req_responses import *
+from constants.email_template import WELCOME_MAIL, RESET_PASSWORD
 from constants import SQL_DUPLICATE_ERR, auth_in_header, string_from_query
 
 ns = api.namespace('users')
@@ -32,27 +35,122 @@ def generate_token(user):
 
 @ns.route('/')
 class UserResource(Resource):
-    @ns.doc(params=auth_in_header)
     @ns.response(*doc_resp(FETCH_RESP))
+    @ns.doc(params=auth_in_header)
     @required_login(as_admin=True)
     def get(self, token_data):
-        user_list = User.query.all()
+        user_list = User.fetch_users()
         return GetUsers(many=True).dump(user_list), 200
 
+    @ns.response(*doc_resp(DELETE_RESP))
+    @ns.doc(params=auth_in_header)
+    @ns.expect(delete_user_model)
+    @required_login()
+    @inject_validated_payload(DeleteUser())
+    def delete(self, payload, token_data):
+        user_id = payload.get('id')
+        User.delete_user(user_id)
+        UserDevices.on_user_delete(user_id)
+        UserFavoriteGenres.on_user_delete(user_id)
+        CreditCard.on_user_delete(user_id)
+        return DELETE_RESP
 
-@ns.route('/auth')
+
+@ns.route('/register')
 class RegisterResource(Resource):
     @ns.response(*doc_resp(CREATE_RESP))
     @ns.expect(user_post_model)
     @ns.marshal_with(user_token_model)
+    @ns.doc(params=string_from_query('device_id'))
     @inject_validated_payload(UserPost())
     def post(self, payload):
         try:
+            device_id = request.args.get('device_id')
+            if device_id is None:
+                raise BadRequest('Device id expected in the query')
             user = User(payload['username'], payload['email'], payload['password'])
             user.db_store()
+            mail.send(Message(
+                subject='Account Created',
+                recipients=[payload.get('email')],
+                body=WELCOME_MAIL.format(payload.get('username'), app.config['APP_NAME']),
+                sender=app.config['MAIL_USERNAME']
+            ))
+            UserDevices(user.id, device_id).db_store()
         except IntegrityError as ie:
             raise SQLDuplicateException(SQL_DUPLICATE_ERR.format(crop_sql_err(str(ie._sql_message))))
-        return generate_token(user)
+        return generate_token(user), 201
+
+
+@ns.route('/login')
+class LoginResource(Resource):
+    @ns.response(*doc_resp(NOT_FOUND))
+    @ns.response(*doc_resp(UNAUTHORIZED))
+    @ns.expect(user_login_model)
+    @ns.marshal_with(user_token_model)
+    @ns.doc(params=string_from_query('device_id'))
+    @inject_validated_payload(UserLogin())
+    def post(self, payload):
+        user = User.login(**payload)
+        device_id = request.args.get('device_id')
+        if device_id is None:
+            raise BadRequest('Device id expected in the query')
+        UserDevices(user.id, device_id).db_store()
+        return generate_token(user), 201
+
+
+@ns.route('/logout')
+class LogoutResource(Resource):
+    @ns.response(*doc_resp(DELETE_RESP))
+    @ns.doc(params=auth_in_header)
+    @ns.doc(params=string_from_query('device_id'))
+    @required_login()
+    def delete(self, token_data):
+        device_id = request.args.get('device_id')
+        if device_id is None:
+            raise BadRequest('Device id expected in the query')
+        UserDevices.delete(token_data.get('id'), device_id)
+        return DELETE_RESP
+
+
+@ns.route('/prejudice')
+class PrejudiceResource(Resource):
+    @ns.response(*doc_resp(FETCH_RESP))
+    @ns.response(*doc_resp(UNAUTHORIZED))
+    @ns.doc(params=auth_in_header)
+    @ns.doc(params=string_from_query('user_id'))
+    @required_login(as_admin=True)
+    def get(self, token_data):
+        user_id = request.args.get('user_id')
+        return {'prejudice': User.get_user_prejudice(user_id)}, 200
+
+
+@ns.route('/reset-password')
+class ResetPasswordResource(Resource):
+    @ns.response(*doc_resp(CREATE_RESP))
+    @ns.response(*doc_resp(BAD_REQUEST))
+    @ns.response(*doc_resp(NOT_FOUND))
+    @ns.doc(params=string_from_query('email'))
+    def post(self):
+        email = request.args.get('email')
+        if email is None:
+            raise BadRequest('Email expected in query')
+        user = User.generate_reset_validation_code(email)
+        mail.send(Message(
+            subject='Reset Password Request',
+            recipients=[email],
+            body=RESET_PASSWORD.format(user.username, user.reset_password_code),
+            sender=app.config['MAIL_USERNAME']
+        ))
+        return CREATE_RESP
+
+    @ns.response(*doc_resp(UPDATE_RESP))
+    @ns.response(*doc_resp(BAD_REQUEST))
+    @ns.expect(reset_password_model)
+    @inject_validated_payload(ResetPassword())
+    def put(self, payload):
+        User.reset_password(**payload)
+        return UPDATE_RESP
 
 
 @ns.route('/user-devices')

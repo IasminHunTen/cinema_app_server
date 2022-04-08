@@ -30,9 +30,31 @@ class UserPost(Schema):
     isAdmin = fields.Boolean(default=False)
 
 
-class GetUsers(fm.Schema):
-    class Meta:
-        fields = ('id', 'username', 'email', 'isAdmin')
+class UserLogin(Schema):
+    username = fields.String(required=True)
+    password = fields.String(required=True)
+
+
+class GetUsers(Schema):
+    id = fields.String()
+    username = fields.String()
+    email = fields.String()
+    isAdmin = fields.Boolean()
+
+
+class DeleteUser(Schema):
+    id = fields.String(required=True)
+
+
+class GetUserPrejudice(Schema):
+    prejudice = fields.Float()
+
+
+class ResetPassword(Schema):
+    email = fields.String(required=True)
+    new_password = fields.String(required=True)
+    validation_code = fields.String(required=True)
+
 
 
 
