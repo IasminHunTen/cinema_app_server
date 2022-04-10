@@ -32,8 +32,8 @@ class GenresResource(Resource):
 
     @ns.response(*doc_resp(CREATE_RESP))
     @ns.expect(genre_post_model)
-    @inject_validated_payload(PostGenre())
     @ns.doc(params=auth_in_header)
+    @inject_validated_payload(PostGenre())
     @required_login(as_admin=True)
     def post(self, payload, token_data):
         Genre(**payload).db_store()

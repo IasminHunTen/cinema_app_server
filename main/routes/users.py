@@ -7,14 +7,14 @@ from datetime import datetime, timedelta
 from werkzeug.exceptions import BadRequest
 
 from extra_modules import mail, SQLDuplicateException
-from controllers import User, UserDevices, UserFavoriteGenres, CreditCard, Tickets
+from controllers import User, UserDevices, UserFavoriteGenres, CreditCard, Tickets, MovieVotes
 from serializable import user_post_model, user_token_model, get_user_devices_model, ufg_model, user_login_model, \
     reset_password_model, delete_user_model, buy_tickets_model, revoke_tickets_model, buy_tickets_response, \
-    price_tickets_model, get_tickets_model
+    price_tickets_model, get_tickets_model, get_movie_votes_model, voted_movie_model
 from serializable.credit_card import *
 from utils import inject_validated_payload, doc_resp, crop_sql_err, required_login, debug_print
 from models import UserPost, GetUsers, GetUserDeviceSchema, UFGSchema, UserLogin, ResetPassword, DeleteUser, \
-    BuyTickets, RevokeTickets, GetUserTickets, PriceTickets
+    BuyTickets, RevokeTickets, GetUserTickets, PriceTickets, GetMovieVotes, VotedMovie
 from models.credit_card import *
 from constants.req_responses import *
 from constants.email_template import WELCOME_MAIL, RESET_PASSWORD
@@ -55,6 +55,7 @@ class UserResource(Resource):
         UserDevices.on_user_delete(user_id)
         UserFavoriteGenres.on_user_delete(user_id)
         CreditCard.on_user_delete(user_id)
+        MovieVotes.on_user_delete(user_id)
         return DELETE_RESP
 
 
@@ -309,3 +310,44 @@ class TicketsManagement(Resource):
         return GetUserTickets(many=True).dump(
             Tickets.get_user_tickets(token_data.get('id'))
         ), 200
+
+    @ns.route('/vote-movie')
+    @ns.response(*doc_resp(UNAUTHORIZED))
+    class VoteMovieResource(Resource):
+
+        @ns.response(*doc_resp(CREATE_RESP))
+        @ns.response(*doc_resp(BAD_REQUEST))
+        @ns.doc(params=auth_in_header)
+        @ns.doc(params=string_from_query('movie_id'))
+        @required_login()
+        def post(self, token_data):
+            movie_id = request.args.get('movie_id')
+            if movie_id is None:
+                raise BadRequest('Movie id expected in query')
+            MovieVotes(movie_id, token_data.get('id')).db_store()
+            return CREATE_RESP
+
+        @ns.response(*doc_resp(FETCH_RESP))
+        @ns.doc(params=auth_in_header)
+        @ns.marshal_with(voted_movie_model)
+        @required_login()
+        def get(self, token_data):
+            return VotedMovie().dump({
+                'movies_id': MovieVotes.fetch_user_votes(token_data.get('id'))
+            }), 200
+
+        @ns.response(*doc_resp(CREATE_RESP))
+        @ns.response(*doc_resp(BAD_REQUEST))
+        @ns.doc(params=auth_in_header)
+        @ns.doc(params=string_from_query('movie_id'))
+        @required_login()
+        def delete(self, token_data):
+            movie_id = request.args.get('movie_id')
+            if movie_id is None:
+                raise BadRequest('Movie id expected in query')
+            MovieVotes.delete_vote(token_data.get('id'), movie_id)
+            return DELETE_RESP
+
+
+
+

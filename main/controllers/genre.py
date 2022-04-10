@@ -12,11 +12,12 @@ class Genre(db.Model):
         self.genre = genre
 
     def db_store(self):
-        try:
+        genre = self.query.filter_by(genre=self.genre).first()
+        if genre is None:
             db.session.add(self)
             db.session.commit()
-        except IntegrityError:
-            pass
+            return self.id
+        return genre.id
 
     @classmethod
     def fetch(cls, ids=None):

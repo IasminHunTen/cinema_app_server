@@ -20,7 +20,8 @@ class PutSchema(Schema):
         dict_validator(attributes, dict_upside_down({
             str: 'title plot poster trailer'.split(),
             int: 'year run_time'.split(),
-            float: 'imdb_rate'
+            float: 'imdb_rate',
+            bool: 'voting_mode'
         }), 1)
 
 
@@ -42,3 +43,7 @@ class GetSchema(Schema):
 class DeleteSchema(Schema):
     id = fields.String(required=True)
 
+
+class GetMovieVotes(Schema):
+    movie_id = fields.String()
+    votes = fields.Integer()

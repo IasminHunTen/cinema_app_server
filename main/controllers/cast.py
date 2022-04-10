@@ -12,11 +12,12 @@ class Cast(db.Model):
         self.name = name
 
     def db_store(self):
-        try:
+        cast = self.query.filter_by(name=self.name).first()
+        if cast is None:
             db.session.add(self)
             db.session.commit()
-        except IntegrityError:
-            return
+            return self.id
+        return cast.id
 
     @classmethod
     def fetch_cast(cls, ids=None):

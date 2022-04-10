@@ -56,5 +56,9 @@ class ResetPassword(Schema):
     validation_code = fields.String(required=True)
 
 
+class VotedMovie(Schema):
+    movies_id = fields.List(fields.String())
+
+
 
 

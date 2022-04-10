@@ -35,3 +35,8 @@ put_movie_model = api.model('PutMovieSchema', {
 delete_movie_model = api.model('DeleteMovieSchema', {
     'id': fields.String(required=True)
 })
+
+get_movie_votes_model = api.model('GetMovieVotesSchema', {
+    'movie_id': fields.String(),
+    'votes': fields.Integer()
+})

@@ -6,7 +6,6 @@ auth_in_header = {
     }
 }
 
-
 def string_from_query(key):
     return {
         key: {

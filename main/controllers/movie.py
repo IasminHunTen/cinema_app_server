@@ -1,5 +1,5 @@
 from extra_modules import db, NotFound
-from utils import uuid_generator, debug_print
+from utils import uuid_generator
 
 
 class Movie(db.Model):
@@ -12,6 +12,7 @@ class Movie(db.Model):
     run_time = db.Column(db.Integer())
     poster = db.Column(db.String(1024))
     trailer = db.Column(db.String(1024))
+    voting_mode = db.Column(db.Boolean())
 
     def __init__(self, tag, title, plot, year, imdb_rate, run_time, poster, trailer):
         self.tag = tag
@@ -22,6 +23,7 @@ class Movie(db.Model):
         self.run_time = run_time
         self.poster = poster
         self.trailer = trailer
+        self.voting_mode = False
 
     def db_store(self):
         db.session.add(self)
@@ -41,12 +43,15 @@ class Movie(db.Model):
         }
 
     @classmethod
-    def fetch_movies(cls, ids=None):
+    def fetch_movies(cls, ids=None, only_votes=False):
+        bulk_movies = cls.query
+        if only_votes:
+            bulk_movies = bulk_movies.filter_by(voting_mode=True)
         if ids is None:
-            return cls.query.all()
+            return bulk_movies.all()
         content = []
         for id in ids:
-            movie = cls.query.get(id)
+            movie = cls.bulk_movies.get(id)
             if movie is None:
                 raise NotFound(f'movie with id={id}')
             content.append(movie)
@@ -80,13 +85,3 @@ class Movie(db.Model):
     @classmethod
     def get_movie_title(cls, id):
         return cls.query.get(id).title
-
-
-
-
-
-
-
-
-
-

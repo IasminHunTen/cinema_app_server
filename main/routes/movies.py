@@ -6,8 +6,7 @@ from extra_modules import SQLDuplicateException
 from utils import doc_resp, inject_validated_payload, required_login, MovieRapidAPI
 from models.movie import *
 from serializable.movie import *
-from controllers import Movie, Cast, Genre, MovieGenres, MovieCast
-
+from controllers import Movie, Cast, Genre, MovieGenres, MovieCast, MovieVotes
 
 ns = api.namespace('movies')
 
@@ -35,16 +34,16 @@ class MovieResource(Resource):
 
             movie_id = Movie.get_id_by_tag(payload.get('tag'))
             for actor in top_cast:
-                Cast(actor).db_store()
-                MovieCast(movie_id, Cast.get_id_by_name(actor)).db_store()
+                cast_id = Cast(actor).db_store()
+                MovieCast(movie_id, cast_id).db_store()
 
             for genre in extra_details.get('genres'):
-                Genre(genre).db_store()
-                MovieGenres(movie_id, Genre.get_id_by_genre(genre)).db_store()
+                genre_id = Genre(genre).db_store()
+                MovieGenres(movie_id, genre_id).db_store()
 
             for director in extra_details.get('directors'):
-                Cast(director).db_store()
-                MovieCast(movie_id, Cast.get_id_by_name(director), True).db_store()
+                cast_id = Cast(director).db_store()
+                MovieCast(movie_id, cast_id, True).db_store()
 
         except SQLDuplicateException as sqe:
             raise sqe
@@ -56,27 +55,60 @@ class MovieResource(Resource):
     @ns.doc(params=auth_in_header)
     @required_login(as_admin=True)
     def get(self, token_data):
-        return GetSchema(many=True).dump(build_movies_payload(Movie.fetch_movies()))
+        return GetSchema(many=True).dump(build_movies_payload(Movie.fetch_movies())), 200
 
     @ns.response(*doc_resp(UPDATE_RESP))
     @ns.expect(put_movie_model)
+    @ns.doc(params=auth_in_header)
     @inject_validated_payload(PutSchema())
     @required_login(as_admin=True)
-    @ns.doc(params=auth_in_header)
-    def put(self, payload):
+    def put(self, payload, token_data):
         Movie.edit_movie(**payload)
+        if 'voting_mode' in payload.get('attributes') and not payload.get('attributes').get('voting_mode'):
+            MovieVotes.on_movie_delete(payload.get('id'))
         return UPDATE_RESP
 
     @ns.response(*doc_resp(DELETE_RESP))
     @ns.expect(delete_movie_model)
+    @ns.doc(params=auth_in_header)
     @inject_validated_payload(DeleteSchema())
     @required_login(as_admin=True)
-    @ns.doc(params=auth_in_header)
     def delete(self, payload, token_data):
         Movie.delete_movies(**payload)
         MovieCast.on_movie_delete(payload.get('id'))
         MovieGenres.on_movie_delete(payload.get('id'))
+        MovieVotes.on_movie_delete(payload.get('id'))
         return DELETE_RESP
+
+
+@ns.route('/voting')
+class MovieVotesResource(Resource):
+
+    @ns.response(*doc_resp(FETCH_RESP))
+    @ns.response(*doc_resp(UNAUTHORIZED))
+    @ns.marshal_list_with(get_movie_model)
+    @ns.doc(params=auth_in_header)
+    @required_login(as_admin=True)
+    def get(self, token_data):
+        return GetSchema(many=True).dump(build_movies_payload(Movie.fetch_movies(only_votes=True))), 200
+
+
+@ns.route('/voting/count')
+class MovieVotingCount(Resource):
+    @ns.response(*doc_resp(UNAUTHORIZED))
+    @ns.response(*doc_resp(FETCH_RESP))
+    @ns.response(*doc_resp(NOT_FOUND))
+    @ns.doc(params=auth_in_header)
+    @ns.marshal_list_with(get_movie_votes_model)
+    @required_login(as_admin=True)
+    def get(self, token_data):
+        movie_votes = []
+        for movie in Movie.fetch_movies(only_votes=True):
+            movie_votes.append({
+                'movie_id': movie.id,
+                'votes': MovieVotes.fetch_votes(movie_id=movie.id)
+            })
+        return GetMovieVotes(many=True).dump(movie_votes), 200
 
 
 def build_movies_payload(movies):

@@ -37,5 +37,9 @@ reset_password_model = api.model('ResetPassword', {
     'validation_code': fields.String(required=True)
 })
 
+voted_movie_model = api.model('VotedMovieSchema', {
+    'movies_id': fields.List(fields.String())
+})
+
 
 

@@ -60,12 +60,3 @@ class ScheduleResource(Resource):
     def delete(self, payload):
         Schedule.delete(**payload)
         return DELETE_RESP
-
-
-
-
-
-
-
-
-
