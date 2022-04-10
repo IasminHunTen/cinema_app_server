@@ -4,6 +4,7 @@ from marshmallow import ValidationError
 from random import choice
 from string import digits
 
+
 def uuid_generator():
     return str(uuid.uuid4())
 
@@ -79,3 +80,11 @@ def debug_print(*args, **kwargs):
 
 def generate_number_sequence(seq_len):
     return ''.join([choice(digits) for _ in range(seq_len)])
+
+
+def config_range(config):
+    def _f():
+        s = config.split('-')
+        return int(s[0]), int(s[1])+1
+
+    return range(*_f())

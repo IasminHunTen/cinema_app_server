@@ -39,5 +39,12 @@ delete_schedule_model = api.model('DeleteScheduleSchema', {
     'id': fields.String(required=True)
 })
 
+schedule_configuration = api.model('ScheduleConfigurationSchema', {
+    'schedule_id': fields.String(),
+    'configuration': fields.String()
+})
 
-
+edit_schedule_model = api.model('EditScheduleSchema', {
+    'schedule_configuration': fields.Nested(schedule_configuration, default={}),
+    'tickets_id': fields.String()
+})

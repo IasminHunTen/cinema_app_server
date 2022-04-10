@@ -42,6 +42,12 @@ class User(db.Model):
         return cls.query.all()
 
     @classmethod
+    def update_prejudice(cls, user_id, amount):
+        user = cls.query.get(user_id)
+        user.revoke_tickets_prejudice += amount
+        db.session.commit()
+
+    @classmethod
     def get_user_prejudice(cls, user_id):
         return cls.query.get(user_id).revoke_tickets_prejudice
 

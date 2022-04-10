@@ -7,12 +7,14 @@ from datetime import datetime, timedelta
 from werkzeug.exceptions import BadRequest
 
 from extra_modules import mail, SQLDuplicateException
-from controllers import User, UserDevices, UserFavoriteGenres, CreditCard
+from controllers import User, UserDevices, UserFavoriteGenres, CreditCard, Tickets
 from serializable import user_post_model, user_token_model, get_user_devices_model, ufg_model, user_login_model, \
-    reset_password_model, delete_user_model
+    reset_password_model, delete_user_model, buy_tickets_model, revoke_tickets_model, buy_tickets_response, \
+    price_tickets_model, get_tickets_model
 from serializable.credit_card import *
 from utils import inject_validated_payload, doc_resp, crop_sql_err, required_login, debug_print
-from models import UserPost, GetUsers, GetUserDeviceSchema, UFGSchema, UserLogin, ResetPassword, DeleteUser
+from models import UserPost, GetUsers, GetUserDeviceSchema, UFGSchema, UserLogin, ResetPassword, DeleteUser, \
+    BuyTickets, RevokeTickets, GetUserTickets, PriceTickets
 from models.credit_card import *
 from constants.req_responses import *
 from constants.email_template import WELCOME_MAIL, RESET_PASSWORD
@@ -114,15 +116,30 @@ class LogoutResource(Resource):
 
 
 @ns.route('/prejudice')
+@ns.response(*doc_resp(UNAUTHORIZED))
 class PrejudiceResource(Resource):
     @ns.response(*doc_resp(FETCH_RESP))
-    @ns.response(*doc_resp(UNAUTHORIZED))
     @ns.doc(params=auth_in_header)
     @ns.doc(params=string_from_query('user_id'))
-    @required_login(as_admin=True)
+    @required_login()
     def get(self, token_data):
-        user_id = request.args.get('user_id')
+        user_id = token_data.get('isAdmin')
+        if token_data.get('isAdmin'):
+            user_id = request.args.get('user_id')
+            if user_id is None:
+                raise BadRequest('User id expected as query param')
         return {'prejudice': User.get_user_prejudice(user_id)}, 200
+
+    @ns.response(*doc_resp(UPDATE_RESP))
+    @ns.doc(params=auth_in_header)
+    @ns.doc(params=string_from_query('amount'))
+    @required_login()
+    def put(self, token_data):
+        amount = request.args.get('amount')
+        if amount is None:
+            raise BadRequest('Amount is expected as query param')
+        User.update_prejudice(token_data.get('id'), float(amount))
+        return UPDATE_RESP
 
 
 @ns.route('/reset-password')
@@ -256,3 +273,39 @@ class CreditCardResource(Resource):
             raise BadRequest("Missing card number from query")
         CreditCard.delete_user_credit_card(card_number)
         return DELETE_RESP
+
+
+@ns.route('/tickets')
+@ns.response(*doc_resp(UNAUTHORIZED))
+class TicketsManagement(Resource):
+    @ns.response(*doc_resp(BAD_REQUEST))
+    @ns.doc(params=auth_in_header)
+    @ns.marshal_with(buy_tickets_response)
+    @ns.expect(buy_tickets_model)
+    @required_login()
+    @inject_validated_payload(BuyTickets())
+    def post(self, payload, token_data):
+        tickets_id, amount = Tickets(user_id=token_data.get('id'), **payload).db_store()
+        return {'tickets_id': tickets_id,
+                'amount': amount}, 201
+
+    @ns.response(*doc_resp(DELETE_RESP))
+    @ns.doc(params=auth_in_header)
+    @ns.expect(revoke_tickets_model)
+    @ns.marshal_with(price_tickets_model)
+    @required_login()
+    @inject_validated_payload(RevokeTickets())
+    def delete(self, payload, token_data):
+        amount = Tickets.revoke_order(**payload)
+        return PriceTickets().dump({
+            'amount': amount
+        })
+
+    @ns.response(*doc_resp(FETCH_RESP))
+    @ns.doc(params=auth_in_header)
+    @ns.marshal_list_with(get_tickets_model)
+    @required_login()
+    def get(self, token_data):
+        return GetUserTickets(many=True).dump(
+            Tickets.get_user_tickets(token_data.get('id'))
+        ), 200

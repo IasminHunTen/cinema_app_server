@@ -2,7 +2,7 @@ from marshmallow import Schema, fields, validate, validates_schema, ValidationEr
 from flask import current_app as app
 from datetime import date
 from controllers import Movie, Schedule
-from utils import tuple_overlap, minutes_2_time
+from utils import tuple_overlap, minutes_2_time, debug_print
 
 
 class PostSchedule(Schema):
@@ -45,3 +45,18 @@ class GetScheduleSchema(Schema):
 
 class DeleteScheduleSchema(Schema):
     id = fields.String(required=True)
+
+
+class EditSchedule(Schema):
+
+    class ScheduleConfiguration(Schema):
+        schedule_id = fields.String(required=True)
+        configuration = fields.String(required=True)
+
+    schedule_configuration = fields.Nested(ScheduleConfiguration(), default=None)
+    tickets_id = fields.String(default=None)
+
+    @validates_schema()
+    def custom_validation(self, data, **kwargs):
+        if len(data) != 1:
+            raise ValidationError('Schema accept only one of schedule_configuration or tickets id at the time')

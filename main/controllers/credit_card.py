@@ -43,6 +43,8 @@ class CreditCard(db.Model):
         if ccv is not None:
             if str(ccv) != cls.__crypto_man.decrypt_word(card.encrypted_ccv):
                 raise BadRequest('Invalid CCV')
+        if card.sold + amount < 0:
+            raise BadRequest(f'Insufficient founds, in order to pay: {amount}')
         card.sold += amount
         db.session.commit()
 

@@ -23,9 +23,9 @@ class RoomResource(Resource):
 
     @ns.response(*doc_resp(CREATE_RESP))
     @ns.expect(post_room_model)
-    @inject_validated_payload(PostRoom())
     @ns.doc(params=auth_in_header)
     @required_login(as_admin=True)
+    @inject_validated_payload(PostRoom())
     def post(self, payload, token_data):
         Room(**payload).db_store()
         return CREATE_RESP

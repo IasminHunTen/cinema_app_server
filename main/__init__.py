@@ -37,6 +37,7 @@ def create_app():
     admin.add_view(ModelView(UserDevices, db.session))
     admin.add_view(ModelView(UserFavoriteGenres, db.session))
     admin.add_view(ModelView(CreditCard, db.session))
+    admin.add_view(ModelView(Tickets, db.session))
     with app.app_context():
         db.create_all()
     return app
