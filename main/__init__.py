@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, Blueprint
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
@@ -19,7 +21,10 @@ def create_app():
     api.add_namespace(movies_ns)
     api.add_namespace(schedule_ns)
     app.register_blueprint(blueprint)
-    app.config.from_object('config.dev.Config')
+    if os.getenv('FLASK_ENV') == 'development':
+        app.config.from_object('config.dev.Config')
+    else:
+        app.config.from_object('config.prod.Config')
 
     mail.init_app(app)
     db.init_app(app)
