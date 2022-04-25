@@ -6,7 +6,7 @@ class Movie(db.Model):
     id = db.Column(db.String(64), primary_key=True, default=uuid_generator)
     tag = db.Column(db.String(32), unique=True)
     title = db.Column(db.String(64))
-    plot = db.Column(db.String(2048))
+    plot = db.Column(db.Text())
     year = db.Column(db.Integer())
     imdb_rate = db.Column(db.Numeric())
     run_time = db.Column(db.Integer())
