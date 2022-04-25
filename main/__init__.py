@@ -4,6 +4,7 @@ from pathlib import Path
 
 from flask import Flask, Blueprint
 from flask_admin import Admin
+from flask_cors import CORS
 from flask_admin.contrib.sqla import ModelView
 root_path = Path(__file__).parent.parent
 root_path = os.path.join(root_path, 'main')
@@ -26,6 +27,7 @@ def create_app():
     api.add_namespace(movies_ns)
     api.add_namespace(schedule_ns)
     app.register_blueprint(blueprint)
+    CORS(app)
     if os.getenv('FLASK_ENV') == 'development':
         app.config.from_object('config.dev.Config')
     else:
