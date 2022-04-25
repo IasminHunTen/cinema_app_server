@@ -1,7 +1,13 @@
 import os
+import sys
+from pathlib import Path
+
 from flask import Flask, Blueprint
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
+root_path = Path(__file__).parent.parent
+root_path = os.path.join(root_path, 'main')
+sys.path.append(root_path)
 from controllers import *
 from extra_modules import db, api, flask_marshal, mail
 from routes import users_ns, casts_ns, genres_ns, rooms_ns, movies_ns, schedule_ns
