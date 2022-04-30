@@ -85,3 +85,8 @@ class Movie(db.Model):
     @classmethod
     def get_movie_title(cls, id):
         return cls.query.get(id).title
+
+    @classmethod
+    def movie_exist(cls, id):
+        return id in [movie.id for movie in cls.query.all()]
+

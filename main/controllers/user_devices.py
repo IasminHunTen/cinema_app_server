@@ -33,9 +33,8 @@ class UserDevices(db.Model):
 
     @classmethod
     def on_user_delete(cls, user_id):
-        [
-            db.session.delete(device) for device in cls.query.filter_by(user_id=user_id).all()
-        ]
+        for device in cls.query.filter_by(user_id=user_id).all():
+            db.session.delete(device)
         db.session.commit()
 
 

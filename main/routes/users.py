@@ -6,8 +6,8 @@ import jwt
 from datetime import datetime, timedelta
 from werkzeug.exceptions import BadRequest
 
-from extra_modules import mail, SQLDuplicateException
-from controllers import User, UserDevices, UserFavoriteGenres, CreditCard, Tickets, MovieVotes
+from extra_modules import mail, SQLDuplicateException, NotFound
+from controllers import User, UserDevices, UserFavoriteGenres, CreditCard, Tickets, MovieVotes, Movie, TokenOnDevice
 from serializable import user_post_model, user_token_model, get_user_devices_model, ufg_model, user_login_model, \
     reset_password_model, delete_user_model, buy_tickets_model, revoke_tickets_model, buy_tickets_response, \
     price_tickets_model, get_tickets_model, get_movie_votes_model, voted_movie_model
@@ -82,7 +82,9 @@ class RegisterResource(Resource):
             UserDevices(user.id, device_id).db_store()
         except IntegrityError as ie:
             raise SQLDuplicateException(SQL_DUPLICATE_ERR.format(crop_sql_err(str(ie._sql_message))))
-        return generate_token(user), 201
+        token = generate_token(user)
+        TokenOnDevice(device_id, token.get('token')).db_store()
+        return token, 201
 
 
 @ns.route('/login')
@@ -99,7 +101,9 @@ class LoginResource(Resource):
         if device_id is None:
             raise BadRequest('Device id expected in the query')
         UserDevices(user.id, device_id).db_store()
-        return generate_token(user), 201
+        token = generate_token(user)
+        TokenOnDevice(device_id, token.get('token')).db_store()
+        return token, 201
 
 
 @ns.route('/logout')
@@ -113,7 +117,21 @@ class LogoutResource(Resource):
         if device_id is None:
             raise BadRequest('Device id expected in the query')
         UserDevices.delete(token_data.get('id'), device_id)
+        TokenOnDevice.device_token(device_id)
         return DELETE_RESP
+
+
+@ns.route('/token')
+class TokenResource(Resource):
+    @ns.response(*doc_resp(FETCH_RESP))
+    @ns.doc(params=string_from_query('device_id'))
+    def get(self):
+        device_id = request.args.get('device_id')
+        if device_id is None:
+            raise BadRequest('Device id expected in the query')
+        return {
+            'token': TokenOnDevice.fetch_token(device_id)
+        }
 
 
 @ns.route('/prejudice')
@@ -324,6 +342,8 @@ class TicketsManagement(Resource):
             movie_id = request.args.get('movie_id')
             if movie_id is None:
                 raise BadRequest('Movie id expected in query')
+            if not Movie.movie_exist(movie_id):
+                raise NotFound(f'Movie with id={movie_id} not found')
             MovieVotes(movie_id, token_data.get('id')).db_store()
             return CREATE_RESP
 

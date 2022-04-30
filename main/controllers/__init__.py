@@ -11,3 +11,4 @@ from .user_devices import UserDevices
 from .user_favorite_genres import UserFavoriteGenres
 from .credit_card import CreditCard
 from .ticket import Tickets
+from .token_on_device import TokenOnDevice
