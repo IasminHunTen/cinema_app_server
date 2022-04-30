@@ -70,14 +70,6 @@ def date_from_string(date_str):
     )
 
 
-def debug_print(*args, **kwargs):
-    print('\n###################################\n')
-    print(*args)
-    for (k, v) in kwargs:
-        print(k, ': ', v)
-    print('\n###################################\n')
-
-
 def generate_number_sequence(seq_len):
     return ''.join([choice(digits) for _ in range(seq_len)])
 
