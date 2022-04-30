@@ -1,4 +1,4 @@
-auth_in_header = {
+auth_in_query = {
     'token': {
         'type': 'auth',
         'in': 'query',

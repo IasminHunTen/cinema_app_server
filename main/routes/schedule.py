@@ -6,7 +6,7 @@ from models.schedule import *
 from serializable import price_tickets_model
 from serializable.schedule import *
 from constants.req_responses import *
-from constants import string_from_query, auth_in_header
+from constants import string_from_query, auth_in_query
 from controllers import Tickets
 from utils import doc_resp, inject_validated_payload, date_from_string, required_login
 
@@ -38,7 +38,7 @@ class ScheduleResource(Resource):
 
     @ns.response(*doc_resp(UNAUTHORIZED))
     @ns.response(*doc_resp(UPDATE_RESP))
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @ns.expect(edit_schedule_model)
     @ns.marshal_with(price_tickets_model)
     @required_login(as_admin=True)

@@ -1,6 +1,6 @@
 from flask_restx import Resource
 
-from constants import auth_in_header, CREATE_RESP, UPDATE_RESP, FETCH_RESP, DELETE_RESP, UNAUTHORIZED
+from constants import auth_in_query, CREATE_RESP, UPDATE_RESP, FETCH_RESP, DELETE_RESP, UNAUTHORIZED
 from utils import doc_resp, inject_validated_payload, required_login
 from models.room import *
 from serializable.room import *
@@ -16,14 +16,14 @@ class RoomResource(Resource):
 
     @ns.response(*doc_resp(FETCH_RESP))
     @ns.marshal_list_with(get_room_model)
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @required_login(as_admin=True)
     def get(self, token_data):
         return GetRoom(many=True).dump(Room.fetch_all())
 
     @ns.response(*doc_resp(CREATE_RESP))
     @ns.expect(post_room_model)
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @required_login(as_admin=True)
     @inject_validated_payload(PostRoom())
     def post(self, payload, token_data):
@@ -33,7 +33,7 @@ class RoomResource(Resource):
     @ns.response(*doc_resp(UPDATE_RESP))
     @ns.expect(put_room_model)
     @inject_validated_payload(PutRoom())
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @required_login(as_admin=True)
     def put(self, payload, token_data):
         try:
@@ -45,7 +45,7 @@ class RoomResource(Resource):
     @ns.response(*doc_resp(DELETE_RESP))
     @ns.expect(delete_room_model, validate=False)
     @inject_validated_payload(DeleteRoom())
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @required_login(as_admin=True)
     def delete(self, payload, token_data):
         try:

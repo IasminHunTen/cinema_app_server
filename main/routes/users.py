@@ -18,7 +18,7 @@ from models import UserPost, GetUsers, GetUserDeviceSchema, UFGSchema, UserLogin
 from models.credit_card import *
 from constants.req_responses import *
 from constants.email_template import WELCOME_MAIL, RESET_PASSWORD
-from constants import SQL_DUPLICATE_ERR, auth_in_header, string_from_query
+from constants import SQL_DUPLICATE_ERR, auth_in_query, string_from_query
 
 ns = api.namespace('users')
 
@@ -38,14 +38,14 @@ def generate_token(user):
 @ns.route('/')
 class UserResource(Resource):
     @ns.response(*doc_resp(FETCH_RESP))
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @required_login(as_admin=True)
     def get(self, token_data):
         user_list = User.fetch_users()
         return GetUsers(many=True).dump(user_list), 200
 
     @ns.response(*doc_resp(DELETE_RESP))
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @ns.expect(delete_user_model)
     @required_login()
     @inject_validated_payload(DeleteUser())
@@ -105,7 +105,7 @@ class LoginResource(Resource):
 @ns.route('/logout')
 class LogoutResource(Resource):
     @ns.response(*doc_resp(DELETE_RESP))
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @ns.doc(params=string_from_query('device_id'))
     @required_login()
     def delete(self, token_data):
@@ -120,7 +120,7 @@ class LogoutResource(Resource):
 @ns.response(*doc_resp(UNAUTHORIZED))
 class PrejudiceResource(Resource):
     @ns.response(*doc_resp(FETCH_RESP))
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @ns.doc(params=string_from_query('user_id'))
     @required_login()
     def get(self, token_data):
@@ -132,7 +132,7 @@ class PrejudiceResource(Resource):
         return {'prejudice': User.get_user_prejudice(user_id)}, 200
 
     @ns.response(*doc_resp(UPDATE_RESP))
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @ns.doc(params=string_from_query('amount'))
     @required_login()
     def put(self, token_data):
@@ -176,7 +176,7 @@ class UserDeviceResource(Resource):
     @ns.response(*doc_resp(FETCH_RESP))
     @ns.response(*doc_resp(NOT_FOUND))
     @ns.marshal_list_with(get_user_devices_model)
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @required_login()
     def get(self, token_data):
         user_devices = UserDevices.fetch_user_device(token_data.get('id'))
@@ -185,7 +185,7 @@ class UserDeviceResource(Resource):
         return GetUserDeviceSchema(many=True).dump(user_devices), 200
 
     @ns.response(*doc_resp(DELETE_RESP))
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @ns.doc(params=string_from_query('device_serial_number'))
     @required_login()
     def delete(self, token_data):
@@ -202,7 +202,7 @@ class UFGResource(Resource):
     @ns.response(*doc_resp(CREATE_RESP))
     @ns.response(*doc_resp(BAD_REQUEST))
     @ns.doc(params=string_from_query('genre_ids'))
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @required_login()
     def post(self, token_data):
         genres_ids = request.args.get('genre_ids')
@@ -214,7 +214,7 @@ class UFGResource(Resource):
 
     @ns.response(*doc_resp(UPDATE_RESP))
     @ns.doc(params=string_from_query('genre_ids'))
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @required_login()
     def put(self, token_data):
         genres_ids = request.args.get('genre_ids')
@@ -223,7 +223,7 @@ class UFGResource(Resource):
         return UPDATE_RESP
 
     @ns.response(*doc_resp(FETCH_RESP))
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @ns.marshal_with(ufg_model)
     @required_login()
     def get(self, token_data):
@@ -235,7 +235,7 @@ class UFGResource(Resource):
 class CreditCardResource(Resource):
     @ns.response(*doc_resp(CREATE_RESP))
     @ns.response(*doc_resp(BAD_REQUEST))
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @ns.expect(post_card_model)
     @inject_validated_payload(PostCreditCard())
     @required_login()
@@ -244,7 +244,7 @@ class CreditCardResource(Resource):
         return CREATE_RESP
 
     @ns.response(*doc_resp(FETCH_RESP))
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @ns.marshal_list_with(get_card_model)
     @required_login()
     def get(self, token_data):
@@ -255,7 +255,7 @@ class CreditCardResource(Resource):
         ), 200
 
     @ns.response(*doc_resp(UPDATE_RESP))
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @ns.expect(edit_card_amount_model)
     @inject_validated_payload(EditCreditCardSold())
     @required_login()
@@ -265,7 +265,7 @@ class CreditCardResource(Resource):
 
     @ns.response(*doc_resp(DELETE_RESP))
     @ns.response(*doc_resp(BAD_REQUEST))
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @ns.doc(params=string_from_query('card_number'))
     @required_login()
     def delete(self,  token_data):
@@ -280,7 +280,7 @@ class CreditCardResource(Resource):
 @ns.response(*doc_resp(UNAUTHORIZED))
 class TicketsManagement(Resource):
     @ns.response(*doc_resp(BAD_REQUEST))
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @ns.marshal_with(buy_tickets_response)
     @ns.expect(buy_tickets_model)
     @required_login()
@@ -291,7 +291,7 @@ class TicketsManagement(Resource):
                 'amount': amount}, 201
 
     @ns.response(*doc_resp(DELETE_RESP))
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @ns.expect(revoke_tickets_model)
     @ns.marshal_with(price_tickets_model)
     @required_login()
@@ -303,7 +303,7 @@ class TicketsManagement(Resource):
         })
 
     @ns.response(*doc_resp(FETCH_RESP))
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @ns.marshal_list_with(get_tickets_model)
     @required_login()
     def get(self, token_data):
@@ -317,7 +317,7 @@ class TicketsManagement(Resource):
 
         @ns.response(*doc_resp(CREATE_RESP))
         @ns.response(*doc_resp(BAD_REQUEST))
-        @ns.doc(params=auth_in_header)
+        @ns.doc(params=auth_in_query)
         @ns.doc(params=string_from_query('movie_id'))
         @required_login()
         def post(self, token_data):
@@ -328,7 +328,7 @@ class TicketsManagement(Resource):
             return CREATE_RESP
 
         @ns.response(*doc_resp(FETCH_RESP))
-        @ns.doc(params=auth_in_header)
+        @ns.doc(params=auth_in_query)
         @ns.marshal_with(voted_movie_model)
         @required_login()
         def get(self, token_data):
@@ -338,7 +338,7 @@ class TicketsManagement(Resource):
 
         @ns.response(*doc_resp(CREATE_RESP))
         @ns.response(*doc_resp(BAD_REQUEST))
-        @ns.doc(params=auth_in_header)
+        @ns.doc(params=auth_in_query)
         @ns.doc(params=string_from_query('movie_id'))
         @required_login()
         def delete(self, token_data):

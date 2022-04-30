@@ -2,7 +2,7 @@ from flask import request
 from flask_restx import Resource
 
 from constants.req_responses import *
-from constants import string_from_query, auth_in_header
+from constants import string_from_query, auth_in_query
 from extra_modules import NotFound
 from utils import doc_resp, inject_validated_payload, required_login
 from models.genre import *
@@ -32,7 +32,7 @@ class GenresResource(Resource):
 
     @ns.response(*doc_resp(CREATE_RESP))
     @ns.expect(genre_post_model)
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @inject_validated_payload(PostGenre())
     @required_login(as_admin=True)
     def post(self, payload, token_data):
@@ -43,7 +43,7 @@ class GenresResource(Resource):
     @ns.response(*doc_resp(NOT_FOUND))
     @ns.response(*doc_resp(DUPLICATED))
     @ns.expect(genre_put_model)
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @inject_validated_payload(PutGenre())
     @required_login(as_admin=True)
     def put(self, payload, token_data):
@@ -56,7 +56,7 @@ class GenresResource(Resource):
     @ns.response(*doc_resp(DELETE_RESP))
     @ns.response(*doc_resp(NOT_FOUND))
     @ns.expect(genre_delete_model)
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @inject_validated_payload(DeleteGenre())
     @required_login(as_admin=True)
     def delete(self, payload, token_data):

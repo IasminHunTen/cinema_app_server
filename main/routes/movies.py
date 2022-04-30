@@ -1,6 +1,6 @@
 from flask_restx import Resource
 
-from constants import auth_in_header
+from constants import auth_in_query
 from constants.req_responses import *
 from extra_modules import SQLDuplicateException
 from utils import doc_resp, inject_validated_payload, required_login, MovieRapidAPI
@@ -21,7 +21,7 @@ class MovieResource(Resource):
     @ns.response(*doc_resp(CREATE_RESP))
     @ns.response(*doc_resp(UNAUTHORIZED))
     @ns.response(*doc_resp(DUPLICATED))
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @ns.expect(post_movie_model)
     @required_login(as_admin=True)
     @inject_validated_payload(PostSchema())
@@ -52,14 +52,14 @@ class MovieResource(Resource):
     @ns.response(*doc_resp(FETCH_RESP))
     @ns.response(*doc_resp(UNAUTHORIZED))
     @ns.marshal_list_with(get_movie_model)
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @required_login(as_admin=True)
     def get(self, token_data):
         return GetSchema(many=True).dump(build_movies_payload(Movie.fetch_movies())), 200
 
     @ns.response(*doc_resp(UPDATE_RESP))
     @ns.expect(put_movie_model)
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @inject_validated_payload(PutSchema())
     @required_login(as_admin=True)
     def put(self, payload, token_data):
@@ -70,7 +70,7 @@ class MovieResource(Resource):
 
     @ns.response(*doc_resp(DELETE_RESP))
     @ns.expect(delete_movie_model)
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @inject_validated_payload(DeleteSchema())
     @required_login(as_admin=True)
     def delete(self, payload, token_data):
@@ -87,7 +87,7 @@ class MovieVotesResource(Resource):
     @ns.response(*doc_resp(FETCH_RESP))
     @ns.response(*doc_resp(UNAUTHORIZED))
     @ns.marshal_list_with(get_movie_model)
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @required_login(as_admin=True)
     def get(self, token_data):
         return GetSchema(many=True).dump(build_movies_payload(Movie.fetch_movies(only_votes=True))), 200
@@ -98,7 +98,7 @@ class MovieVotingCount(Resource):
     @ns.response(*doc_resp(UNAUTHORIZED))
     @ns.response(*doc_resp(FETCH_RESP))
     @ns.response(*doc_resp(NOT_FOUND))
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @ns.marshal_list_with(get_movie_votes_model)
     @required_login(as_admin=True)
     def get(self, token_data):

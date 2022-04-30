@@ -22,10 +22,10 @@ def inject_validated_payload(schema):
 def required_login(as_admin=False):
     def decorator(f):
         def wrapper(*args, **kwargs):
-            if 'Token' not in request.args:
+            if 'token' not in request.args:
                 raise AuthException('Auth Token is missing')
             try:
-                token_data = jwt.decode(request.args.get('Token'), app.config['SECRET_KEY'], 'HS256')
+                token_data = jwt.decode(request.args.get('token'), app.config['SECRET_KEY'], 'HS256')
             except jwt.PyJWTError as e:
                 raise AuthException(e)
             if as_admin and not token_data.get('isAdmin'):

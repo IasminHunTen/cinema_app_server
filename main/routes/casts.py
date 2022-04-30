@@ -1,7 +1,7 @@
 from flask import request
 from flask_restx import Resource
 
-from constants import auth_in_header, string_from_query
+from constants import auth_in_query, string_from_query
 from constants.req_responses import *
 from extra_modules import api, NotFound
 from controllers import Cast
@@ -17,7 +17,7 @@ ns = api.namespace('casts')
 class CastsResource(Resource):
     @ns.response(*doc_resp(CREATE_RESP))
     @ns.expect(cast_post_model)
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @required_login(as_admin=True)
     @inject_validated_payload(PostCast())
     def post(self, payload, token_data):
@@ -26,7 +26,7 @@ class CastsResource(Resource):
 
     @ns.response(*doc_resp(UPDATE_RESP))
     @ns.expect(cast_put_model)
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @inject_validated_payload(PutCast())
     @required_login(as_admin=True)
     def put(self, payload, token_data):
@@ -38,7 +38,7 @@ class CastsResource(Resource):
 
     @ns.response(*doc_resp(DELETE_RESP))
     @ns.expect(cast_delete_model)
-    @ns.doc(params=auth_in_header)
+    @ns.doc(params=auth_in_query)
     @inject_validated_payload(DeleteActor())
     @required_login(as_admin=True)
     def delete(self, payload, token_data):
