@@ -1,10 +1,11 @@
 auth_in_header = {
     'token': {
         'type': 'auth',
-        'in': 'header',
+        'in': 'query',
         'name': 'Auth Token'
     }
 }
+
 
 def string_from_query(key):
     return {
