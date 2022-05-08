@@ -4,7 +4,7 @@ from extra_modules import db
 class TokenOnDevice(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     device_id = db.Column(db.String(256))
-    token = db.Column(db.String(256))
+    token = db.Column(db.Text())
 
     def __init__(self, device_id, token):
         self.device_id = device_id
