@@ -37,7 +37,8 @@ class Schedule(db.Model):
         self.day = day
         self.hour = hour
         self.minute = minute
-        self.sits_configuration = 'f' * Room.get_sits_by_id(room_id)
+        self.sits_left = Room.get_sits_by_id(room_id)
+        self.sits_configuration = 'f' * self.sits_left
         self.price = price if price else app.config['STANDARD_PRICE']
 
     def db_store(self):
