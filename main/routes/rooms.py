@@ -17,8 +17,7 @@ class RoomResource(Resource):
     @ns.response(*doc_resp(FETCH_RESP))
     @ns.marshal_list_with(get_room_model)
     @ns.doc(params=auth_in_query)
-    @required_login(as_admin=True)
-    def get(self, token_data):
+    def get(self):
         return GetRoom(many=True).dump(Room.fetch_all())
 
     @ns.response(*doc_resp(CREATE_RESP))

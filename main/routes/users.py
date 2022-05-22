@@ -29,7 +29,7 @@ def generate_token(user):
         'username': user.username,
         'email': user.email,
         'isAdmin': user.isAdmin,
-        'exp': datetime.now() + timedelta(hours=2)
+        'exp': datetime.now() + timedelta(seconds=app.config['TOKEN_VALIDITY'])
     }, key=app.config['SECRET_KEY'])
 
     return {'token': token}
@@ -129,8 +129,12 @@ class TokenResource(Resource):
         device_id = request.args.get('device_id')
         if device_id is None:
             raise BadRequest('Device id expected in the query')
+        token = TokenOnDevice.fetch_token(device_id)
+        if jwt.decode(token, key=app.config['SECRET_KEY'], algorithms='HS256').get('exp') < datetime.now().timestamp():
+            TokenOnDevice.delete_token(device_id)
+            raise UNAUTHORIZED('Token has expired')
         return {
-            'token': TokenOnDevice.fetch_token(device_id)
+            'token': token
         }
 
 

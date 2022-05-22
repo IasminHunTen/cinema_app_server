@@ -1,3 +1,5 @@
+import datetime
+
 import jwt
 from marshmallow import ValidationError
 import json
@@ -26,6 +28,8 @@ def required_login(as_admin=False):
                 raise AuthException('Auth Token is missing')
             try:
                 token_data = jwt.decode(request.args.get('token'), app.config['SECRET_KEY'], 'HS256')
+                if datetime.datetime.now().timestamp() > token_data['exp']:
+                    raise AuthException('Token has expired')
             except jwt.PyJWTError as e:
                 raise AuthException(e)
             if as_admin and not token_data.get('isAdmin'):

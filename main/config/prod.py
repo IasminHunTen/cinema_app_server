@@ -6,6 +6,7 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = os.getenv('SECRET_KEY')
+    TOKEN_VALIDITY = int(os.getenv('TOKEN_VALIDITY'))
     START_HOUR = int(os.getenv('START_HOUR'))
     LIMIT_HOUR = int(os.getenv('LIMIT_HOUR'))
     GAP_BETWEEN_MOVIES = int(os.getenv('GAP_BETWEEN_MOVIES'))

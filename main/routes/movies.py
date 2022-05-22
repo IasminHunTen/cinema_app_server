@@ -53,8 +53,7 @@ class MovieResource(Resource):
     @ns.response(*doc_resp(UNAUTHORIZED))
     @ns.marshal_list_with(get_movie_model)
     @ns.doc(params=auth_in_query)
-    @required_login(as_admin=True)
-    def get(self, token_data):
+    def get(self):
         return GetSchema(many=True).dump(build_movies_payload(Movie.fetch_movies())), 200
 
     @ns.response(*doc_resp(UPDATE_RESP))
