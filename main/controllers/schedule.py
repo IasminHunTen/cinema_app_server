@@ -67,9 +67,10 @@ class Schedule(db.Model):
         if schedule is None:
             return
         offset = (date.today() - schedule.day).days
-        for s in cls.query.all():
-            s.day += timedelta(days=offset)
-        db.session.commit()
+        if offset > 0:
+            for s in cls.query.all():
+                s.day += timedelta(days=offset)
+            db.session.commit()
 
     @classmethod
     def get_movies_from_one_day(cls, date=None):
