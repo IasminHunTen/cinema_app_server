@@ -75,3 +75,11 @@ class GetLatestDateResource(Resource):
         return GetLatestDateSchema().dump({
             'date': latest_date
         })
+
+
+@ns.route('/update_schedule')
+class UpdateSchedule(Resource):
+    @ns.response(*doc_resp(UPDATE_RESP))
+    def put(self):
+        Schedule.update_schedule()
+        return UPDATE_RESP

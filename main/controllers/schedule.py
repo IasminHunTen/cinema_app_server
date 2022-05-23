@@ -1,6 +1,9 @@
+import datetime
+
 from flask import current_app as app
 from sqlalchemy import desc
 from werkzeug.exceptions import BadRequest
+from datetime import date, timedelta
 
 from extra_modules import db
 from utils import uuid_generator, config_range
@@ -57,6 +60,16 @@ class Schedule(db.Model):
     def get_latest_day(cls):
         schedule = db.session.query(Schedule).order_by(desc('day')).first()
         return schedule.day if schedule is not None else None
+
+    @classmethod
+    def update_schedule(cls):
+        schedule = db.session.query(Schedule).order_by('day').first()
+        if schedule is None:
+            return
+        offset = (date.today() - schedule.day).days
+        for s in cls.query.all():
+            s.day += timedelta(days=offset)
+        db.session.commit()
 
     @classmethod
     def get_movies_from_one_day(cls, date=None):
