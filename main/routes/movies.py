@@ -1,6 +1,7 @@
 from flask_restx import Resource
+from flask import request
 
-from constants import auth_in_query
+from constants import auth_in_query, string_from_query
 from constants.req_responses import *
 from extra_modules import SQLDuplicateException
 from utils import doc_resp, inject_validated_payload, required_login, MovieRapidAPI
@@ -52,9 +53,12 @@ class MovieResource(Resource):
     @ns.response(*doc_resp(FETCH_RESP))
     @ns.response(*doc_resp(UNAUTHORIZED))
     @ns.marshal_list_with(get_movie_model)
-    @ns.doc(params=auth_in_query)
+    @ns.doc(params=string_from_query('ids'))
     def get(self):
-        return GetSchema(many=True).dump(build_movies_payload(Movie.fetch_movies())), 200
+        ids = request.args.get('ids')
+        if ids is not None:
+            ids = ids.split()
+        return GetSchema(many=True).dump(build_movies_payload(Movie.fetch_movies(ids=ids))), 200
 
     @ns.response(*doc_resp(UPDATE_RESP))
     @ns.expect(put_movie_model)

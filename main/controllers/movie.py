@@ -51,7 +51,7 @@ class Movie(db.Model):
             return bulk_movies.all()
         content = []
         for id in ids:
-            movie = cls.bulk_movies.get(id)
+            movie = bulk_movies.get(id)
             if movie is None:
                 raise NotFound(f'movie with id={id}')
             content.append(movie)

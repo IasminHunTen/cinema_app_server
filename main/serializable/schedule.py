@@ -25,6 +25,10 @@ get_schedule_model = api.model('GetScheduleSchema', {
     'sits_configuration': fields.String()
 })
 
+get_latest_date = api.model('GetLatestDateSchema', {
+    'date': fields.Date()
+})
+
 delete_schedule_model = api.model('DeleteScheduleSchema', {
     'id': fields.String(required=True)
 })

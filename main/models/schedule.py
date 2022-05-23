@@ -43,6 +43,10 @@ class GetScheduleSchema(Schema):
     price = fields.Float()
 
 
+class GetLatestDateSchema(Schema):
+    date = fields.Date()
+
+
 class DeleteScheduleSchema(Schema):
     id = fields.String(required=True)
 

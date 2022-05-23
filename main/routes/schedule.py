@@ -1,6 +1,7 @@
 from flask_restx import Resource
 from flask import request
 
+from extra_modules import NotFound
 from models import PriceTickets
 from models.schedule import *
 from serializable import price_tickets_model
@@ -60,3 +61,17 @@ class ScheduleResource(Resource):
     def delete(self, payload):
         Schedule.delete(**payload)
         return DELETE_RESP
+
+
+@ns.route('/latest_date')
+class GetLatestDateResource(Resource):
+
+    @ns.response(*doc_resp(FETCH_RESP))
+    @ns.marshal_with(get_latest_date)
+    def get(self):
+        latest_date = Schedule.get_latest_day()
+        if latest_date is None:
+            raise NotFound('Empty Schedule')
+        return GetLatestDateSchema().dump({
+            'date': latest_date
+        })

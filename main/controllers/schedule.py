@@ -1,4 +1,5 @@
 from flask import current_app as app
+from sqlalchemy import desc
 from werkzeug.exceptions import BadRequest
 
 from extra_modules import db
@@ -51,6 +52,11 @@ class Schedule(db.Model):
         if program is not None:
             db.session.delete(program)
             db.session.commit()
+
+    @classmethod
+    def get_latest_day(cls):
+        schedule = db.session.query(Schedule).order_by(desc('day')).first()
+        return schedule.day if schedule is not None else None
 
     @classmethod
     def get_movies_from_one_day(cls, date=None):
