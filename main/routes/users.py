@@ -1,3 +1,5 @@
+import logging
+
 from flask_restx import Resource
 from flask import current_app as app, request
 from flask_mail import Message
@@ -96,10 +98,11 @@ class LoginResource(Resource):
     @ns.doc(params=string_from_query('device_id'))
     @inject_validated_payload(UserLogin())
     def post(self, payload):
-        user = User.login(**payload)
+        logging.error(payload)
         device_id = request.args.get('device_id')
         if device_id is None:
             raise BadRequest('Device id expected in the query')
+        user = User.login(**payload)
         UserDevices(user.id, device_id).db_store()
         token = generate_token(user)
         TokenOnDevice(device_id, token.get('token')).db_store()
