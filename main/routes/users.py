@@ -83,7 +83,7 @@ class RegisterResource(Resource):
             ))
             UserDevices(user.id, device_id).db_store()
         except IntegrityError as ie:
-            raise SQLDuplicateException(SQL_DUPLICATE_ERR.format(crop_sql_err(str(ie._sql_message))))
+            raise SQLDuplicateException(ie.args[0])
         token = generate_token(user)
         TokenOnDevice(device_id, token.get('token')).db_store()
         return token, 201
