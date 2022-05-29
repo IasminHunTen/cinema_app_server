@@ -136,16 +136,17 @@ class TokenResource(Resource):
         if device_id is None:
             raise BadRequest('Device id expected in the query')
         token = TokenOnDevice.fetch_token(device_id)
-        logging.error(f"token: {token}")
-        try:
-            jwt.decode(token, key=app.config['SECRET_KEY'], algorithms='HS256')
-            return {
-                'token': token
-            }
-        except Exception as e:
-            logging.error(e)
-
-
+        logging.debug(f"token: {token}")
+        if token is not None:
+            try:
+                jwt.decode(token, key=app.config['SECRET_KEY'], algorithms='HS256')
+            except Exception as e:
+                logging.error(e)
+                TokenOnDevice.delete_token(device_id)
+                token = None
+        return {
+            'token': token
+        }
 
 @ns.route('/prejudice')
 @ns.response(*doc_resp(UNAUTHORIZED))
