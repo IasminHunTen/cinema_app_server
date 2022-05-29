@@ -82,8 +82,11 @@ class RegisterResource(Resource):
                 sender=app.config['MAIL_USERNAME']
             ))
             UserDevices(user.id, device_id).db_store()
+
         except IntegrityError as ie:
             raise SQLDuplicateException(ie.args[0])
+        except Exception as ie:
+            logging.error(ie)
         token = generate_token(user)
         TokenOnDevice(device_id, token.get('token')).db_store()
         return token, 201
@@ -135,15 +138,13 @@ class TokenResource(Resource):
         token = TokenOnDevice.fetch_token(device_id)
         logging.error(f"token: {token}")
         try:
-            if token is not None:
-                if jwt.decode(token, key=app.config['SECRET_KEY'], algorithms='HS256').get('exp') < datetime.now().timestamp():
-                    TokenOnDevice.delete_token(device_id)
-                    token = None
+            jwt.decode(token, key=app.config['SECRET_KEY'], algorithms='HS256')
             return {
                 'token': token
             }
         except Exception as e:
-            logging.error(e);
+            logging.error(e)
+
 
 
 @ns.route('/prejudice')
