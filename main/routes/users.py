@@ -268,11 +268,9 @@ class CreditCardResource(Resource):
     @ns.response(*doc_resp(CREATE_RESP))
     @ns.response(*doc_resp(BAD_REQUEST))
     @ns.doc(params=auth_in_query)
-    @ns.expect(post_card_model)
-    @inject_validated_payload(PostCreditCard())
     @required_login()
-    def post(self, payload, token_data):
-        CreditCard(token_data.get('id'), **payload).db_store()
+    def post(self, token_data):
+        CreditCard(token_data.get('id')).db_store()
         return CREATE_RESP
 
     @ns.response(*doc_resp(FETCH_RESP))

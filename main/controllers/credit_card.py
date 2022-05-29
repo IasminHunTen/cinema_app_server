@@ -1,3 +1,6 @@
+import datetime
+import random
+
 from werkzeug.exceptions import BadRequest
 
 from extra_modules import db
@@ -20,12 +23,13 @@ class CreditCard(db.Model):
 
     __crypto_man = CryptoManager()
 
-    def __init__(self, holder_id, expire_year, expire_month, ccv, sold=50.0):
+    def __init__(self, holder_id):
+        today = datetime.date.today()
         self.holder_id = holder_id
-        self.expire_year = expire_year
-        self.expire_month = expire_month
-        self.encrypted_ccv = self.__crypto_man.encrypt_word(str(ccv))
-        self.sold = sold
+        self.expire_year = today.year + 2
+        self.expire_month = today.month
+        self.encrypted_ccv = random.randint(100, 999)
+        self.sold = 200
 
     def db_store(self):
         db.session.add(self)
@@ -36,13 +40,9 @@ class CreditCard(db.Model):
         return cls.query.filter_by(holder_id=user_id).all()
 
     @classmethod
-    def alter_credit_card_sold(cls, card_number, amount, ccv=None):
-
+    def alter_credit_card_sold(cls, card_number, amount):
         card = cls.query.get(card_number)
         cls.__crypto_man.decrypt_word(card.encrypted_ccv)
-        if ccv is not None:
-            if str(ccv) != cls.__crypto_man.decrypt_word(card.encrypted_ccv):
-                raise BadRequest('Invalid CCV')
         if card.sold + amount < 0:
             raise BadRequest(f'Insufficient founds, in order to pay: {amount}')
         card.sold += amount
