@@ -50,6 +50,7 @@ def create_app():
     admin.add_view(ModelView(UserFavoriteGenres, db.session))
     admin.add_view(ModelView(CreditCard, db.session))
     admin.add_view(ModelView(Tickets, db.session))
+    admin.add_view(ModelView(TokenOnDevice, db.session))
     return app
 
 
