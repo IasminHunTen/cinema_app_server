@@ -52,8 +52,8 @@ class User(db.Model):
         return cls.query.get(user_id).revoke_tickets_prejudice
 
     @classmethod
-    def reset_password(cls, email, new_password, validation_code):
-        user = cls.query.filter_by(email=email).first()
+    def reset_password(cls, username, new_password, validation_code):
+        user = cls.query.filter_by(username=username).first()
         if user.reset_password_code is None:
             raise AuthException('Request for password change was not made')
         if user.reset_password_code != validation_code:
@@ -63,8 +63,8 @@ class User(db.Model):
         db.session.commit()
 
     @classmethod
-    def generate_reset_validation_code(cls, email):
-        user = cls.query.filter_by(email=email).first()
+    def generate_reset_validation_code(cls, username):
+        user = cls.query.filter_by(username=username).first()
         if user is None:
             raise NotFound('No user found with this email')
         user.reset_password_code = generate_number_sequence(6)

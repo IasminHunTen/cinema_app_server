@@ -32,7 +32,7 @@ user_prejudice_model = api.model('GetUserPrejudice', {
 })
 
 reset_password_model = api.model('ResetPassword', {
-    'email': fields.String(required=True),
+    'username': fields.String(required=True),
     'new_password': fields.String(required=True),
     'validation_code': fields.String(required=True)
 })

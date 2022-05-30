@@ -29,4 +29,4 @@ class TokenOnDevice(db.Model):
         if td:
             db.session.delete(td)
             db.session.commit()
-            
+

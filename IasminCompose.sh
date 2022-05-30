@@ -1,13 +1,13 @@
 #!/bin/bash
 
-if test $# -eq 0
+if test $# -ne 1
 then
-	echo "missing commit messge"
+	echo "expect a single argument, namely a string for the commit message"
 	exit 1
 fi
 
 git add .
-git commit -m \"$@\"
+git commit -m \"$1\"
 git push
 git push heroku main
 exit 0

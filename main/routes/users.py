@@ -181,19 +181,23 @@ class ResetPasswordResource(Resource):
     @ns.response(*doc_resp(CREATE_RESP))
     @ns.response(*doc_resp(BAD_REQUEST))
     @ns.response(*doc_resp(NOT_FOUND))
-    @ns.doc(params=string_from_query('email'))
+    @ns.doc(params=string_from_query('username'))
     def post(self):
-        email = request.args.get('email')
-        if email is None:
-            raise BadRequest('Email expected in query')
-        user = User.generate_reset_validation_code(email)
-        mail.send(Message(
-            subject='Reset Password Request',
-            recipients=[email],
-            body=RESET_PASSWORD.format(user.username, user.reset_password_code),
-            sender=app.config['MAIL_USERNAME']
-        ))
-        return CREATE_RESP
+        try:
+            username = request.args.get('username')
+            if username is None:
+                raise BadRequest('Email expected in query')
+            user = User.generate_reset_validation_code(username)
+            mail.send(Message(
+                subject='Reset Password Request',
+                recipients=[user.email],
+                body=RESET_PASSWORD.format(user.username, user.reset_password_code),
+                sender=app.config['MAIL_USERNAME']
+            ))
+            return CREATE_RESP
+        except Exception as e:
+            logging.error(e)
+            raise e
 
     @ns.response(*doc_resp(UPDATE_RESP))
     @ns.response(*doc_resp(BAD_REQUEST))
