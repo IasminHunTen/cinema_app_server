@@ -12,12 +12,12 @@ class Config(object):
     GAP_BETWEEN_MOVIES = 30
     STANDARD_PRICE = 20
     APP_NAME = 'Hunty Cinema'
-    MAIL_SERVER = 'smtp.gmail.com'
-    MAIL_PORT = 465
-    MAIL_USERNAME = 'cinema.mobile.app@gmail.com'
-    MAIL_PASSWORD = 'BerlinDefence'
-    MAIL_USE_TLS = False
-    MAIL_USE_SSL = True
+    MAIL_SERVER = 'outlook.office365.com'
+    MAIL_PORT = 587
+    MAIL_USERNAME = 'huntycinema@outlook.com'
+    MAIL_PASSWORD = 'berlinDefence'
+    MAIL_USE_TLS = True
+    MAIL_USE_SSL = False
 
 
 
