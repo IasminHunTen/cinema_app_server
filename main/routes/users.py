@@ -148,6 +148,7 @@ class TokenResource(Resource):
             'token': token
         }
 
+
 @ns.route('/prejudice')
 @ns.response(*doc_resp(UNAUTHORIZED))
 class PrejudiceResource(Resource):

@@ -28,3 +28,5 @@ class TokenOnDevice(db.Model):
         td = cls.query.filter_by(device_id=device_id).first()
         if td:
             db.session.delete(td)
+            db.session.commit()
+            
