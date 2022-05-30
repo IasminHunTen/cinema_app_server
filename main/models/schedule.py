@@ -1,7 +1,7 @@
 from marshmallow import Schema, fields, validate, validates_schema, ValidationError
 from flask import current_app as app
 from datetime import date
-from controllers import Movie, Schedule
+from controllers import Movie, Schedule, Room
 from utils import tuple_overlap, minutes_2_time, debug_print
 
 
@@ -31,12 +31,17 @@ class PostSchedule(Schema):
                                       f"overlaps with other interval {minutes_2_time(*time_stamp)} from the chosen room")
 
 
+class RoomRaws(fields.Raw):
+    def __format__(self, format_spec):
+        return Room.get_raws_by_id(format_spec)
+
+
 class GetScheduleSchema(Schema):
     id = fields.String()
     movie_id = fields.String()
-    room_id = fields.String()
     sits_left = fields.Integer()
     sits_configuration = fields.String()
+    room_id = fields.String()
     day = fields.Date()
     hour = fields.Integer()
     minute = fields.Integer()

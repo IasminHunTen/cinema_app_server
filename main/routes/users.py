@@ -186,7 +186,7 @@ class ResetPasswordResource(Resource):
         try:
             username = request.args.get('username')
             if username is None:
-                raise BadRequest('Email expected in query')
+                raise BadRequest('Username expected in query')
             user = User.generate_reset_validation_code(username)
             mail.send(Message(
                 subject='Reset Password Request',

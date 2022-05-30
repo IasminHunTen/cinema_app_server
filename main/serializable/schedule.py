@@ -13,16 +13,22 @@ post_schedule_model = api.model('PostScheduleSchema', {
     'price': fields.Float()
 })
 
+
+class RoomRaws(fields.Integer):
+    def format(self, value):
+        return Room.get_raws_by_id(value)
+
+
 get_schedule_model = api.model('GetScheduleSchema', {
     'id': fields.String(),
     'movie_id': fields.String(),
-    'room_id': fields.String(),
     'day': fields.Date(),
     'hour': fields.Integer(),
     'minute': fields.Integer(),
     'price': fields.Float(),
     'sits_left': fields.Integer(),
-    'sits_configuration': fields.String()
+    'sits_configuration': fields.String(),
+    'room_raws': RoomRaws(attribute='room_id')
 })
 
 get_latest_date = api.model('GetLatestDateSchema', {

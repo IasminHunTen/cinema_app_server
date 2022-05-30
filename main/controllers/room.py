@@ -65,6 +65,11 @@ class Room(db.Model):
     def get_room_name_by_id(cls, id):
         return cls.query.get(id).name
 
+    @classmethod
+    def get_raws_by_id(cls, id):
+        room = cls.query.get(id)
+        return room.column_count
+
 
 
 
