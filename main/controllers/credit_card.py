@@ -42,7 +42,6 @@ class CreditCard(db.Model):
     @classmethod
     def alter_credit_card_sold(cls, card_number, amount):
         card = cls.query.get(card_number)
-        cls.__crypto_man.decrypt_word(card.encrypted_ccv)
         if card.sold + amount < 0:
             raise BadRequest(f'Insufficient founds, in order to pay: {amount}')
         card.sold += amount

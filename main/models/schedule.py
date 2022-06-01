@@ -69,3 +69,9 @@ class EditSchedule(Schema):
     def custom_validation(self, data, **kwargs):
         if len(data) != 1:
             raise ValidationError('Schema accept only one of schedule_configuration or tickets id at the time')
+
+
+class RefreshScheduleSchema(Schema):
+
+    configuration = fields.String()
+    sits_left = fields.Integer()

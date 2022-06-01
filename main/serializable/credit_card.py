@@ -19,6 +19,5 @@ get_card_model = api.model('GetCreditCardSchema', {
 edit_card_amount_model = api.model('EditCreditCardAmountSchema', {
     'card_number': fields.String(),
     'amount': fields.Float(),
-    'ccv': fields.Integer()
 })
 

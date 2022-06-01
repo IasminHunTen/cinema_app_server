@@ -28,4 +28,3 @@ class GetCreditCard(Schema):
 class EditCreditCardSold(Schema):
     card_number = fields.String(required=True)
     amount = fields.Float(required=True)
-    ccv = fields.Integer()

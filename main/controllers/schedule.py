@@ -106,4 +106,7 @@ class Schedule(db.Model):
         db.session.commit()
         return len(change_index) * schedule.price * (1 if marker == 'f' else -1)
 
+    @classmethod
+    def refresh_schedule(cls, schedule_id):
+        return cls.query.get(schedule_id)
 

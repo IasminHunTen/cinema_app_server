@@ -48,3 +48,8 @@ edit_schedule_model = api.model('EditScheduleSchema', {
     'schedule_configuration': fields.Nested(schedule_configuration, default={}),
     'tickets_id': fields.String()
 })
+
+refresh_schedule = api.model("RefreshScheduleSchema", {
+    'configuration': fields.String(),
+    'sits_left': fields.String()
+})

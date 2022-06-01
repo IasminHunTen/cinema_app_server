@@ -1,5 +1,6 @@
 from flask_restx import Resource
 from flask import request
+from werkzeug.exceptions import BadRequest
 
 from extra_modules import NotFound
 from models import PriceTickets
@@ -83,3 +84,21 @@ class UpdateSchedule(Resource):
     def put(self):
         Schedule.update_schedule()
         return UPDATE_RESP
+
+
+@ns.route('/refresh_schedule')
+class RefreshSchedule(Resource):
+    @ns.response(*doc_resp(FETCH_RESP))
+    @ns.response(*doc_resp(NOT_FOUND))
+    @ns.doc(params=string_from_query('id'))
+    def get(self):
+        id = request.args.get('id')
+        if id is None:
+            raise BadRequest("id expected in query")
+        schedule = Schedule.refresh_schedule(id)
+        if schedule is None:
+            return NotFound(f"schedule with id: {id}")
+        return RefreshScheduleSchema().dump({
+            'configuration': schedule.sits_configuration,
+            'sits_left': schedule.sits_left
+        })
