@@ -40,7 +40,6 @@ def generate_token(user):
 @ns.route('/')
 class UserResource(Resource):
     @ns.response(*doc_resp(FETCH_RESP))
-    @ns.doc(params=auth_in_query)
     @required_login(as_admin=True)
     def get(self, token_data):
         user_list = User.fetch_users()
@@ -59,6 +58,19 @@ class UserResource(Resource):
         CreditCard.on_user_delete(user_id)
         MovieVotes.on_user_delete(user_id)
         return DELETE_RESP
+
+
+@ns.route('/me')
+@ns.doc(params=auth_in_query)
+class UserMeResource(Resource):
+    @ns.response(*doc_resp(FETCH_RESP))
+    @ns.response(*doc_resp(NOT_FOUND))
+    @required_login()
+    def get(self, token_data):
+        me = User.fetch_my_self(token_data['id'])
+        if me is None:
+            raise NotFound(f"User with id: {token_data['id']} not found")
+        return GetUsers().dump(User.fetch_my_self(token_data['id']))
 
 
 @ns.route('/register')

@@ -52,6 +52,3 @@ class RoomResource(Resource):
             return DELETE_RESP
         except Exception as e:
             raise e
-
-
-

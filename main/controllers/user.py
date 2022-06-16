@@ -42,6 +42,10 @@ class User(db.Model):
         return cls.query.all()
 
     @classmethod
+    def fetch_my_self(cls, id):
+        return cls.query.get(id)
+
+    @classmethod
     def update_prejudice(cls, user_id, amount):
         user = cls.query.get(user_id)
         user.revoke_tickets_prejudice += amount
